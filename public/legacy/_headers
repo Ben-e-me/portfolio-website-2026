@@ -1,0 +1,4 @@
+
+/_modules/*.mjs
+  Content-Type: application/javascript
+  Cache-Control: no-cache

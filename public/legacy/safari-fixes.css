@@ -1,0 +1,15 @@
+/* Safari workaround: 3D carousel is disabled (effectsRotate=0 in JS). */
+
+/* Safari: overflow:hidden + will-change:transform breaks corner-radius clipping
+   after hover animations. GPU layer via translateZ(0) keeps clipping stable.
+   overflow:clip avoids the scroll-container compositing issue entirely. */
+@supports (-webkit-hyphens: none) {
+  .framer-OHD0R .framer-e1450a,
+  .framer-dwanta {
+    overflow: clip !important;
+    -webkit-clip-path: inset(0 round 20px);
+    clip-path: inset(0 round 20px);
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+}

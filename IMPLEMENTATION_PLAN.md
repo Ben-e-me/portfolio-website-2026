@@ -2,7 +2,7 @@
 
 > Master Plan: `../project files/master-plan.md`
 > Time horizon: ~4–8 weeks part-time
-> Current status: **M0 in progress**
+> Current status: **M1 next**
 
 ---
 
@@ -10,7 +10,7 @@
 
 | Milestone | Status | Notes |
 |---|---|---|
-| **M0** Setup & Fallback | in progress | Old repo tagged `framer-baseline-2026`. New repo + Next.js scaffold + Legacy Layer done. Cloudflare + Tracking pending. |
+| **M0** Setup & Fallback | **done** 2026-05-28 | Static export, iframe legacy layer, Cloudflare Pages + DNS, CF Analytics + Clarity live. |
 | **M1** Research | pending | 8–12 competitor sites via Claude in Chrome MCP. 1 subagent per site. |
 | **M2** Audience & Positioning | pending | 4 parallel positioning subagents (Defender / Conservative / Bold / Synthesizer). |
 | **M3** Status-Quo Assessment | pending | 4-POV review per page (Recruiter / Founder / Freelance-Lead / Design-Leader). |
@@ -55,8 +55,8 @@
 - [x] Legacy Layer: Framer HTML → `public/legacy/`, 11 pages in `app/(legacy)/`
 - [x] CLAUDE.md + IMPLEMENTATION_PLAN.md
 - [x] GitHub Actions Lighthouse CI skeleton
-- [ ] Cloudflare Pages Project connected + DNS `ben-e.me` switched
-- [ ] Cloudflare Web Analytics activated
-- [ ] Microsoft Clarity activated
+- [x] Cloudflare Pages Project connected + DNS `ben-e.me` switched
+- [x] Cloudflare Web Analytics activated (Token: ec3112e86b694a0caad3132122a0514)
+- [x] Microsoft Clarity activated (Project ID: wy3zkc51c4)
 - [ ] `_inputs/` populated with Beni's prior Claude-Design outputs
-- [ ] Initial commit + push to `main`
+- [x] Initial commit + push to `main`

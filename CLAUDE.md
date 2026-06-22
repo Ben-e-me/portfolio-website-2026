@@ -12,8 +12,9 @@
 
 ### Legacy Layer (temporary, Phase A)
 
-`app/(legacy)/[route]/page.tsx` files embed old Framer HTML via full-viewport iframes.
-Static files live in `public/legacy/`. As each page is rebuilt, the `(legacy)` file is deleted and the real route takes over.
+Framer HTML files live at `public/<page>.html` (root). Cloudflare static-file precedence means they serve directly — no `app/` wrapper. Clarity snippet is inlined before `</body>` in each.
+
+Wave-Cutover: delete `public/<page>.html` in the same PR that adds `app/<page>/page.tsx`. Static file gone → Next.js route takes over instantly. Delete `_assets/` + `_modules/` entries only when the last Framer page referencing them is removed.
 
 ### Phase B Routes (new builds, Wave-by-Wave)
 
@@ -22,7 +23,7 @@ Static files live in `public/legacy/`. As each page is rebuilt, the `(legacy)` f
 
 ### Design System
 
-`MASTER.md` (created in M5) is the single source for colors, type, spacing, tokens.
+`design.md` (created in M5) is the single source for colors, type, spacing, tokens.
 Tailwind config reflects those tokens. shadcn/ui components extend them.
 
 ## Conventions
@@ -33,17 +34,26 @@ Tailwind config reflects those tokens. shadcn/ui components extend them.
 - `RELEASES.md` entry per page release (date, page, change, expected KPI effect)
 - No README needed — IMPLEMENTATION_PLAN.md is the source of truth
 
+## Wave-Cutover Pre-Flight
+
+Run in Cloudflare Branch Preview before merging any Wave PR:
+
+- [ ] Click every nav link → URL updates, no full reload
+- [ ] Direct-URL load + reload → correct page, no 404
+- [ ] DevTools Network → no 404s for images / fonts / assets
+- [ ] Test with extensions enabled (AdBlocker on) → layout intact
+- [ ] Lighthouse in incognito → perf ≥90, a11y/seo/bp ≥95 (warn mode during transitional phase)
+
 ## Key Files
 
 - `IMPLEMENTATION_PLAN.md` — milestone + wave status
-- `MASTER.md` — design system (created M5)
+- `design.md` — design system (created M5)
 - `RELEASES.md` — release log (created W1)
-- `public/legacy/` — Framer static HTML + assets (temporary)
 
 ## Lighthouse CI Gates (enforced per PR)
 
 Performance ≥ 90 · Accessibility ≥ 95 · Best Practices ≥ 95 · SEO ≥ 95
 
-## Tracking (live from M0)
+## Tracking
 
-Cloudflare Web Analytics + Microsoft Clarity (5 custom events: CV-Download, Case-Tiefenklick, Contact-Click, Portfolio-PDF-Click, Scroll-Depth >75%)
+Cloudflare Web Analytics (cookieless, no banner). **Microsoft Clarity removed 2026-06-22** (GDPR: no cookie banner) — to be run later only in consciously-gated research-sprints. The 5 custom events (CV-Download, Case-Tiefenklick, Contact-Click, Portfolio-PDF-Click, Scroll-Depth >75%) are deferred with Clarity.

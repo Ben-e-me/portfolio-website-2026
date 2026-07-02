@@ -1,22 +1,18 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Outfit } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const outfit = Outfit({
+  variable: "--font-outfit",
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Benjamin Erxleben — Digital Product Designer",
+  title: "Benjamin Erxleben — Senior Product Designer",
   description:
-    "Freelance Digital Product Designer helping growing startups navigate the challenges of scaling design.",
+    "Senior Product Designer, 20 years across the full product lifecycle — building product and brand as one system that earns trust over time.",
 };
 
 export default function RootLayout({
@@ -25,7 +21,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
+    <html lang="en" className={outfit.variable}>
       <body>{children}</body>
       <Script
         defer

@@ -7,114 +7,195 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  /* BenE ink steps (fg-1 / fg-2 / fg-3) */
+  --color-ink: var(--bene-indigo-deep);
+  --color-ink-muted: rgba(19, 7, 56, 0.7);
+  --color-ink-subtle: rgba(19, 7, 56, 0.4);
+
+  /* BenE iceberg accents — gradients + small accents, not primary surfaces */
+  --color-bene-purple: var(--bene-purple);
+  --color-bene-blue: var(--bene-blue-bright);
+  --color-bene-blue-light: var(--bene-blue-light);
+  --color-bene-cyan: var(--bene-cyan);
+  --color-bene-green: var(--bene-green);
+  --color-bene-green-glow: var(--bene-green-bright);
+
+  --font-sans: var(--font-outfit), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-heading: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* shadcn UI-primitive radii (small: buttons, inputs, popovers) */
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
+  /* BenE signature radii (big: cards, shells, sections) */
+  --radius-card: 1.5rem;
+  --radius-shell: 2.5rem;
+  --radius-section: 5rem;
+  --radius-pill: 9999px;
+
+  /* Type scale — colour-agnostic (colour applied per context, see design.md) */
+  --text-display: 5rem;
+  --text-display--line-height: 1;
+  --text-display--letter-spacing: -0.01em;
+  --text-h1: 3.5rem;
+  --text-h1--line-height: 1.05;
+  --text-h1--letter-spacing: -0.005em;
+  --text-h2: 2.25rem;
+  --text-h2--line-height: 1.2;
+  --text-h3: 1.875rem;
+  --text-h3--line-height: 1.2;
+  --text-h4: 1.375rem;
+  --text-h4--line-height: 1.25;
+  --text-body-lg: 1.375rem;
+  --text-body-lg--line-height: 1.5;
+  --text-body: 1.125rem;
+  --text-body--line-height: 1.5;
+  --text-small: 0.875rem;
+  --text-small--line-height: 1.35;
+  --text-micro: 0.75rem;
+  --text-micro--line-height: 1.35;
+
+  /* BenE shadows — purple-tinted, never grey */
+  --shadow-card: 0 8px 32px -12px rgba(13, 7, 38, 0.1);
+  --shadow-lift: 0 12px 48px -12px rgba(104, 59, 255, 0.2);
+  --shadow-hero: 0 24px 80px -24px rgba(104, 59, 255, 0.35), 0 0 16px rgba(9, 222, 159, 0.2);
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --radius: 0.5rem;
+
+  /* Brand source values */
+  --bene-purple: #683bff;
+  --bene-purple-hover: #5a2fe8;
+  --bene-purple-press: #4d26d0;
+  --bene-purple-soft: rgba(104, 59, 255, 0.08);
+  --bene-indigo-deep: #130738;
+  --bene-indigo-shadow: #0a15ab;
+  --bene-blue-bright: #257af2;
+  --bene-blue-light: #269df2;
+  --bene-cyan: #02c1db;
+  --bene-green: #0cd096;
+  --bene-green-bright: #09de9f;
+  --bene-bg-section: #e6edf2;
+  --bene-bg-cool: #ebedf5;
+
+  /* shadcn semantic — light (BenE brand mapped in) */
+  --background: var(--bene-bg-section);
+  --foreground: var(--bene-indigo-deep);
+  --card: #ffffff;
+  --card-foreground: var(--bene-indigo-deep);
+  --popover: #ffffff;
+  --popover-foreground: var(--bene-indigo-deep);
+  --primary: var(--bene-purple);
+  --primary-foreground: #ffffff;
+  --secondary: var(--bene-bg-cool);
+  --secondary-foreground: var(--bene-indigo-deep);
+  --muted: var(--bene-bg-cool);
+  --muted-foreground: rgba(19, 7, 56, 0.65);
+  --accent: var(--bene-purple-soft);
+  --accent-foreground: var(--bene-purple);
+  --destructive: #e5484d;
+  --border: rgba(19, 7, 56, 0.1);
+  --input: rgba(19, 7, 56, 0.14);
+  --ring: var(--bene-purple);
+
+  --chart-1: var(--bene-purple);
+  --chart-2: var(--bene-blue-bright);
+  --chart-3: var(--bene-cyan);
+  --chart-4: var(--bene-green);
+  --chart-5: var(--bene-green-bright);
+
+  --sidebar: #ffffff;
+  --sidebar-foreground: var(--bene-indigo-deep);
+  --sidebar-primary: var(--bene-purple);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: var(--bene-purple-soft);
+  --sidebar-accent-foreground: var(--bene-purple);
+  --sidebar-border: rgba(19, 7, 56, 0.1);
+  --sidebar-ring: var(--bene-purple);
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 150ms;
+  --dur-base: 240ms;
+  --dur-slow: 380ms;
+
+  /* Hero gradient — indigo · purple · aurora-green */
+  --grad-hero:
+    radial-gradient(45% 70% at 42% 28%, rgba(138, 155, 255, 0.7) 0%, rgba(138, 155, 255, 0.3) 40%, transparent 70%),
+    radial-gradient(40% 65% at 62% 62%, rgba(186, 170, 255, 0.65) 0%, rgba(186, 170, 255, 0.25) 42%, transparent 70%),
+    radial-gradient(95% 130% at -10% 118%, #17d69e 0%, rgba(23, 214, 158, 0.8) 28%, rgba(23, 214, 158, 0.3) 52%, transparent 72%),
+    radial-gradient(95% 120% at -12% -8%, #7a66ff 0%, rgba(122, 102, 255, 0.8) 32%, rgba(122, 102, 255, 0.3) 56%, transparent 76%),
+    radial-gradient(100% 140% at 115% 55%, #6d4cff 0%, rgba(109, 76, 255, 0.8) 30%, rgba(109, 76, 255, 0.28) 54%, transparent 74%),
+    linear-gradient(135deg, #6a7bff 0%, #6b8bff 45%, #3fc8b0 100%);
 }
 
+/* Dark = provisional scaffold, untuned — light-first for iteration 1 (see design.md) */
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --background: #0a0620;
+  --foreground: #ffffff;
+  --card: #130738;
+  --card-foreground: #ffffff;
+  --popover: #130738;
+  --popover-foreground: #ffffff;
+  --primary: var(--bene-purple);
+  --primary-foreground: #ffffff;
+  --secondary: #1b1340;
+  --secondary-foreground: #ffffff;
+  --muted: #1b1340;
+  --muted-foreground: rgba(255, 255, 255, 0.65);
+  --accent: rgba(104, 59, 255, 0.18);
+  --accent-foreground: #ffffff;
+  --destructive: #ff6166;
+  --border: rgba(255, 255, 255, 0.12);
+  --input: rgba(255, 255, 255, 0.16);
+  --ring: var(--bene-purple);
+  --sidebar: #130738;
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: var(--bene-purple);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: rgba(104, 59, 255, 0.18);
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: rgba(255, 255, 255, 0.12);
+  --sidebar-ring: var(--bene-purple);
 }
 
 @layer base {
@@ -123,6 +204,8 @@
   }
   body {
     @apply bg-background text-foreground;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
   html {
     @apply font-sans;

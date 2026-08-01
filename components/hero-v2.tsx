@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { DotGrid, DotGridTuner, DOT_GRID_DEFAULTS, type DotGridConfig } from "@/components/dot-grid";
 import { useSlidingUnderline, UnderlineBar } from "@/components/sliding-underline";
 import { COPY_VARIANTS } from "@/components/copy-variants";
+import { DevOverlayStack, DevOverlay } from "@/components/dev-overlays";
 
 /* Values read off the Figma artboard "Landing / Home" (117:82) via figma-cli.
    Design width 1200, content column 1136, hero auto-layout pad 64/0/40/80. */
@@ -21,21 +22,38 @@ const STATS = [
   { value: "60", quant: "+", label: "Projects" },
 ];
 
-const CLIENTS = [
-  "Sparkasse", "Teufel", "AOK", "Dominos", "SonyMusic", "ERGO",
-  "Payback", "BerlinChemie", "CaraCare", "DojoMadness", "Wefox",
+/* Per-logo optical sizes straight from the Figma client row — they are
+   deliberately uneven so the marks read as the same visual weight. */
+const CLIENT_LOGOS = [
+  { n: "Sparkasse", w: 110, h: 37.5 },
+  { n: "Teufel", w: 72.5, h: 31.7 },
+  { n: "AOK", w: 105.7, h: 33.3 },
+  { n: "Dominos", w: 124.9, h: 30 },
+  { n: "SonyMusic", w: 150, h: 33.3 },
+  { n: "ERGO", w: 82.4, h: 23.3 },
+  { n: "Payback", w: 81.3, h: 25 },
+  { n: "BerlinChemie", w: 166.5, h: 26.7 },
+  { n: "CaraCare", w: 131.7, h: 30 },
+  { n: "DojoMadness", w: 84, h: 30.8 },
+  { n: "Wefox", w: 93, h: 25 },
 ];
+
+const LOGO_GAP = 64;
 
 const AUDIENCES = [
   { key: "recruiters", label: "For Recruiters" },
   { key: "businesses", label: "For Businesses" },
 ] as const;
 
-/* Panel overlap: how far the trust panel pokes into the first viewport. */
 const PANEL_PEEK = 120;
 
-/* Fade a hero element out as the panel edge approaches it: full opacity while
-   the panel top is still 40px below the element, gone by 20px. */
+/* The hero is pinned, so only the panel moves. Fading off an absolute gap would
+   start the lowest element already faded at rest, because it sits close to the
+   panel edge. So it runs off how far the panel has travelled from its resting
+   position instead, staggered bottom-to-top. */
+const FADE_DURATION = 260;
+const FADE_STAGGER = 90;
+
 function useScrollFade() {
   const panelRef = useRef<HTMLDivElement>(null);
   const items = useRef<HTMLElement[]>([]);
@@ -46,29 +64,56 @@ function useScrollFade() {
 
   useEffect(() => {
     let raf = 0;
+    let baselines: { el: HTMLElement; gap: number; order: number }[] = [];
+
+    /* The pinned hero doesn't move, and the panel tracks scroll 1:1, so the
+       resting gap is simply the current gap plus how far we've scrolled. No
+       need to jump the page to measure it. */
+    const calibrate = () => {
+      const panel = panelRef.current;
+      if (!panel) return;
+      const panelTop = panel.getBoundingClientRect().top;
+      const y = window.scrollY;
+      baselines = items.current
+        .map((el) => {
+          const top = el.getBoundingClientRect().top;
+          return { el, gap: panelTop - top + y, top };
+        })
+        .sort((a, b) => b.top - a.top) // bottom-most first
+        .map((b, order) => ({ el: b.el, gap: b.gap, order }));
+    };
+
     const update = () => {
       raf = 0;
       const panel = panelRef.current;
       if (!panel) return;
       const panelTop = panel.getBoundingClientRect().top;
-      for (const el of items.current) {
-        const t = el.getBoundingClientRect().top;
-        const gap = panelTop - t;
-        const o = Math.min(1, Math.max(0, (gap - 20) / 20));
-        el.style.opacity = String(o);
-        el.style.visibility = o === 0 ? "hidden" : "visible";
+      for (const { el, gap, order } of baselines) {
+        const travel = gap - (panelTop - el.getBoundingClientRect().top);
+        const t = Math.min(1, Math.max(0, (travel - order * FADE_STAGGER) / FADE_DURATION));
+        const eased = 1 - t * t * (3 - 2 * t); // inverted smoothstep
+        el.style.opacity = String(eased);
+        el.style.visibility = eased < 0.01 ? "hidden" : "visible";
       }
     };
+
     const onScroll = () => {
       if (!raf) raf = requestAnimationFrame(update);
     };
+
+    const onResize = () => {
+      calibrate();
+      onScroll();
+    };
+
+    calibrate();
     update();
     window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
+    window.addEventListener("resize", onResize);
     return () => {
       if (raf) cancelAnimationFrame(raf);
       window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
+      window.removeEventListener("resize", onResize);
     };
   }, []);
 
@@ -77,18 +122,12 @@ function useScrollFade() {
 
 export function HeroV2() {
   const [config, setConfig] = useState<DotGridConfig>(DOT_GRID_DEFAULTS);
-  const [tuning, setTuning] = useState(false);
   const [audience, setAudience] = useState(0);
   const [variant, setVariant] = useState(0);
-  const [showSwitch, setShowSwitch] = useState(true);
 
   const nav = useSlidingUnderline<HTMLElement>(0);
   const aud = useSlidingUnderline<HTMLDivElement>(audience);
   const { panelRef, register } = useScrollFade();
-
-  useEffect(() => {
-    setTuning(new URLSearchParams(window.location.search).has("tune"));
-  }, []);
 
   const copy = COPY_VARIANTS[variant];
   const focus =
@@ -98,11 +137,7 @@ export function HeroV2() {
     const { text, bold } = copy.subline;
     const parts = text.split(new RegExp(`(${bold.map(escapeRe).join("|")})`, "g"));
     return parts.map((p, i) =>
-      bold.includes(p) ? (
-        <strong key={i} className="font-semibold">{p}</strong>
-      ) : (
-        <span key={i}>{p}</span>
-      ),
+      bold.includes(p) ? <strong key={i} className="font-semibold">{p}</strong> : <span key={i}>{p}</span>,
     );
   };
 
@@ -110,50 +145,41 @@ export function HeroV2() {
     <>
       <section className="sticky top-0 h-svh overflow-hidden text-white">
         <div className="absolute inset-0" style={{ background: "var(--grad-hero)" }} />
-        <DotGrid config={config} />
 
-        {/* Accents live in the 1200 container, not the full-bleed layer, so they
-            stay behind the elements they belong to on any viewport width. */}
-        <div className="pointer-events-none absolute inset-0 flex justify-center">
-          <div className="relative w-full max-w-[1200px] px-8">
-            {/* behind the LinkedIn tile, nudged up and right of its centre */}
+        {/* Content-tracked accents. Blurred ellipses like the Figma layer stack,
+            positioned inside the 1200 column so they stay behind the elements
+            they belong to at any aspect ratio. */}
+        <div className="pointer-events-none absolute inset-0 flex justify-center overflow-hidden">
+          <div className="relative h-full w-full max-w-[1200px] px-8">
+            {/* Figma "Accent Linkedin" — behind the tile, up and right of it */}
             <div
-              className="absolute right-[-6%] top-[-14%] h-[54vh] w-[42%]"
-              style={{
-                background:
-                  "radial-gradient(closest-side, rgba(12,208,150,0.85) 0%, rgba(12,208,150,0.34) 45%, transparent 78%)",
-              }}
+              className="absolute right-[-3%] top-[-16%] h-[46vh] w-[26%] rounded-full"
+              style={{ background: "rgba(12,208,150,0.85)", filter: "blur(110px)" }}
             />
-            {/* behind the competence row, sized to it */}
+            {/* Figma "Accent KPIs" — width of the competence row */}
             <div
-              className="absolute bottom-[calc(120px-6vh)] left-20 h-[26vh] w-[440px] max-w-[46%]"
-              style={{
-                background:
-                  "radial-gradient(closest-side, rgba(9,222,159,0.93) 0%, rgba(9,222,159,0.4) 48%, transparent 80%)",
-              }}
+              className="absolute bottom-[70px] left-16 h-[22vh] w-[460px] max-w-[48%] rounded-full"
+              style={{ background: "rgba(9,222,159,0.93)", filter: "blur(100px)" }}
             />
           </div>
         </div>
 
-        {/* Portrait — height is coupled to the viewport so the hair keeps the
-            same 64px gap to the nav that the audience selector has. */}
-        <div
-          className="pointer-events-none absolute inset-x-0 hidden justify-center lg:flex"
-          style={{ top: `${32 + 66 + 64}px`, bottom: `${PANEL_PEEK}px` }}
-        >
-          <div className="flex w-full max-w-[1200px] items-stretch justify-end px-8">
-            {/* Figma crops the 802x582 source into a 407x483 frame; mirror that
-                ratio and crop rather than letterboxing the landscape PNG. */}
-            {/* Height tracks the viewport; width is capped at the Figma frame so
-                the portrait can never cross into the 626px copy column. */}
-            <div className="h-full w-[clamp(260px,32%,420px)] overflow-hidden">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/portrait.png"
-                alt="Benjamin Erxleben"
-                className="h-full w-full select-none object-cover object-top"
-              />
-            </div>
+        <DotGrid config={config} />
+
+        {/* Portrait — sized off the Figma render by head height, not frame
+            height: the Figma source is a 16:9 photo cropped to 77.5% width,
+            this PNG is a tight crop, so matching the frame would oversize the
+            face. Head reads ~32% of the hero there, which puts this image at
+            ~60% of hero height with the hair starting ~27% down. Full aspect,
+            no side crop; bleeds right and is cut at the bottom by the panel. */}
+        <div className="pointer-events-none absolute inset-x-0 top-[27%] hidden h-[60%] justify-center lg:flex">
+          <div className="relative w-full max-w-[1200px] px-8">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/portrait.png"
+              alt="Benjamin Erxleben"
+              className="absolute right-[-16%] top-0 h-full w-auto max-w-none select-none object-contain"
+            />
           </div>
         </div>
 
@@ -176,16 +202,20 @@ export function HeroV2() {
               </span>
             </a>
 
+            {/* Figma builds each item as a 32px box with an invisible 1px rule on
+                top mirroring the underline, so the label sits optically centred.
+                Same result here: fixed 32px track, label centred, bar pinned to
+                its bottom edge so it never shifts the text. */}
             <nav
               ref={nav.trackRef}
-              className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-8 pb-2 md:flex"
+              className="absolute left-1/2 top-1/2 hidden h-8 -translate-x-1/2 -translate-y-1/2 items-center gap-8 md:flex"
             >
               {NAV.map((item, i) => (
                 <a
                   key={item.label}
                   data-underline-item
                   href={item.href}
-                  className={`text-[18px] uppercase leading-none tracking-[0.16em] transition-colors ${focus} ${
+                  className={`flex h-full items-center text-[18px] uppercase leading-none tracking-[0.16em] transition-colors ${focus} ${
                     i === 0 ? "text-white" : "text-white/35 hover:text-white/70"
                   }`}
                 >
@@ -208,66 +238,54 @@ export function HeroV2() {
           </header>
 
           <div className="flex min-h-0 flex-1 flex-col justify-between pb-[160px] pt-16 lg:pl-20">
-            {/* Audience selector — same sliding rule, no separator dot */}
             <div ref={register} className="shrink-0">
-            <div
-              ref={aud.trackRef}
-              className="relative flex w-fit items-center gap-8 pb-2 text-[20px] leading-none"
-            >
-              {AUDIENCES.map((a, i) => (
-                <button
-                  key={a.key}
-                  data-underline-item
-                  type="button"
-                  onClick={() => setAudience(i)}
-                  aria-pressed={audience === i}
-                  className={`transition-colors ${focus} ${
-                    audience === i ? "text-white" : "text-white/35 hover:text-white/70"
-                  }`}
-                >
-                  {a.label}
-                </button>
-              ))}
-              <UnderlineBar bar={aud.bar} />
-            </div>
+              <div
+                ref={aud.trackRef}
+                className="relative flex h-8 w-fit items-center gap-8 text-[20px] leading-none"
+              >
+                {AUDIENCES.map((a, i) => (
+                  <button
+                    key={a.key}
+                    data-underline-item
+                    type="button"
+                    onClick={() => setAudience(i)}
+                    aria-pressed={audience === i}
+                    className={`flex h-full items-center transition-colors ${focus} ${
+                      audience === i ? "text-white" : "text-white/35 hover:text-white/70"
+                    }`}
+                  >
+                    {a.label}
+                  </button>
+                ))}
+                <UnderlineBar bar={aud.bar} />
+              </div>
             </div>
 
-            <div className="flex max-w-[626px] flex-col gap-10">
-              {/* Darkener is bound to the copy box itself, so it covers the text
-                  at any viewport ratio instead of being squeezed on mobile. */}
-              <div className="relative flex flex-col gap-8" ref={register}>
-                <div
-                  aria-hidden
-                  className="pointer-events-none absolute -inset-x-[18%] -inset-y-[42%] -z-10"
-                  style={{
-                    background:
-                      "radial-gradient(closest-side, rgba(19,7,56,0.6) 0%, rgba(19,7,56,0.36) 52%, transparent 82%)",
-                  }}
-                />
+            {/* Headline, subline and CTAs fade as one group */}
+            <div ref={register} className="relative flex max-w-[626px] flex-col gap-10">
+              {/* Darkener bound to this block, so it always sits under the copy */}
+              <div
+                aria-hidden
+                className="pointer-events-none absolute -inset-x-[32%] -inset-y-[75%] -z-10 rounded-full"
+                style={{ background: "rgba(19,7,56,0.8)", filter: "blur(90px)" }}
+              />
+
+              <div className="flex flex-col gap-8">
                 <h1 className="flex items-center gap-1.5 text-[clamp(2.25rem,4.6vw,3.5rem)] font-medium leading-none tracking-[-0.01em] text-white/[0.45] text-balance">
                   {copy.headline.lead}
                   {copy.headline.arrow && (
                     <svg viewBox="0 0 23 22" fill="none" className="h-[0.4em] w-auto shrink-0" aria-hidden>
-                      <path
-                        d="M1 11h20M13 3l8 8-8 8"
-                        stroke="currentColor"
-                        strokeWidth="2.6"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
+                      <path d="M1 11h20M13 3l8 8-8 8" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   )}
                   {copy.headline.arrow && <span className="sr-only">to</span>}
                   {copy.headline.rest}
                 </h1>
 
-                <p className="text-[clamp(1.0625rem,1.7vw,1.5rem)] leading-[1.4]">
-                  {renderSubline()}
-                </p>
+                <p className="text-[clamp(1.0625rem,1.7vw,1.5rem)] leading-[1.4]">{renderSubline()}</p>
               </div>
 
-              <div className="flex flex-wrap items-center gap-4" ref={register}>
-                {/* Primary — Figma "Frame 7": purple + 70% green radial */}
+              <div className="flex flex-wrap items-center gap-4">
                 <a
                   href="#cv"
                   className={`group relative inline-flex h-[46px] items-center gap-3 overflow-hidden rounded-[8px] bg-bene-purple px-5 text-[20px] font-medium text-white transition-[transform,box-shadow,background-color] duration-200 hover:-translate-y-0.5 hover:bg-[#5a2fe8] active:translate-y-0 active:bg-[#4d26d0] ${focus}`}
@@ -275,21 +293,17 @@ export function HeroV2() {
                 >
                   <span
                     aria-hidden
-                    className="pointer-events-none absolute inset-0 transition-opacity duration-200 group-hover:opacity-100"
+                    className="pointer-events-none absolute inset-0 opacity-85 transition-opacity duration-200 group-hover:opacity-100"
                     style={{
-                      opacity: 0.85,
                       background:
                         "radial-gradient(100% 120% at 100% 133%, rgba(12,208,150,0.7) 0%, rgba(12,208,150,0) 100%)",
                     }}
                   />
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src="/icons/Icon_Download_Page.svg" alt="" aria-hidden className="relative h-5 w-auto brightness-0 invert" />
-                  <span className="relative">
-                    {audience === 0 ? "Download CV" : "See the work"}
-                  </span>
+                  <span className="relative">{audience === 0 ? "Download CV" : "See the work"}</span>
                 </a>
 
-                {/* Secondary — Figma "Frame 4": white @1%, 1.5px stroke, background blur 14 */}
                 <a
                   href="#contact"
                   className={`group relative inline-flex h-[46px] items-center gap-2.5 overflow-hidden rounded-[8px] border-[1.5px] border-white bg-white/[0.01] px-5 text-[20px] font-medium text-white backdrop-blur-[14px] transition-[transform,background-color] duration-200 hover:-translate-y-0.5 hover:bg-white/15 active:translate-y-0 active:bg-white/25 ${focus}`}
@@ -310,7 +324,7 @@ export function HeroV2() {
               </div>
             </div>
 
-            <ul className="flex shrink-0 items-center gap-[26px]" ref={register}>
+            <ul ref={register} className="flex shrink-0 items-center gap-[26px]">
               {STATS.map((s, i) => (
                 <li key={s.label} className="flex items-center gap-[26px]">
                   {i > 0 && <span aria-hidden className="h-[31px] w-px bg-white/40" />}
@@ -328,7 +342,6 @@ export function HeroV2() {
         </div>
       </section>
 
-      {/* Trust panel — Figma "Content": r40, #E6EDF2, pt 24 */}
       <div
         ref={panelRef}
         className="relative z-10 rounded-t-[40px] bg-background text-ink shadow-[0_-24px_60px_-24px_rgba(19,7,56,0.35)]"
@@ -346,35 +359,40 @@ export function HeroV2() {
                 "linear-gradient(90deg, transparent 0, black 40px, black calc(100% - 40px), transparent 100%)",
             }}
           >
-            <ul
-              className="flex w-max items-center gap-9 motion-reduce:animate-none"
+            {/* Two identical sets, spacing carried as per-item margin so the
+                track width is exactly 2x one set and -50% loops seamlessly. */}
+            <div
+              className="flex w-max items-center motion-reduce:animate-none"
               style={{ animation: "marquee-x 59s linear infinite" }}
             >
-              {[...CLIENTS, ...CLIENTS].map((name, i) => (
-                <li key={`${name}-${i}`} className="shrink-0">
-                  {/* Masked so the mark takes the ink colour rather than staying black */}
-                  <span
-                    role={i < CLIENTS.length ? "img" : undefined}
-                    aria-label={i < CLIENTS.length ? name : undefined}
-                    aria-hidden={i >= CLIENTS.length}
-                    className="block h-10 w-[120px] bg-ink/70"
-                    style={{
-                      maskImage: `url(/logos/${name}.svg)`,
-                      WebkitMaskImage: `url(/logos/${name}.svg)`,
-                      maskRepeat: "no-repeat",
-                      WebkitMaskRepeat: "no-repeat",
-                      maskPosition: "center",
-                      WebkitMaskPosition: "center",
-                      maskSize: "contain",
-                      WebkitMaskSize: "contain",
-                    }}
-                  />
-                </li>
+              {[0, 1].map((set) => (
+                <ul key={set} className="flex items-center" aria-hidden={set === 1}>
+                  {CLIENT_LOGOS.map((l) => (
+                    <li key={l.n} style={{ marginRight: LOGO_GAP }} className="shrink-0">
+                      <span
+                        role={set === 0 ? "img" : undefined}
+                        aria-label={set === 0 ? l.n : undefined}
+                        className="block bg-[#130738]"
+                        style={{
+                          width: l.w,
+                          height: l.h,
+                          maskImage: `url(/logos/${l.n}.svg)`,
+                          WebkitMaskImage: `url(/logos/${l.n}.svg)`,
+                          maskRepeat: "no-repeat",
+                          WebkitMaskRepeat: "no-repeat",
+                          maskPosition: "center",
+                          WebkitMaskPosition: "center",
+                          maskSize: "contain",
+                          WebkitMaskSize: "contain",
+                        }}
+                      />
+                    </li>
+                  ))}
+                </ul>
               ))}
-            </ul>
+            </div>
           </div>
 
-          {/* Long enough that the whole hero fade sequence can play out */}
           <div className="mx-auto mt-20 grid max-w-[1200px] gap-6 px-8 pb-[120vh] md:grid-cols-3">
             {["Selected Work", "Approach", "Get in touch"].map((t) => (
               <div key={t} className="rounded-card bg-card p-8 shadow-card">
@@ -388,22 +406,9 @@ export function HeroV2() {
         </div>
       </div>
 
-      {/* Copy version switch */}
-      {showSwitch && (
-        <div className="fixed bottom-4 left-4 z-50 w-[min(22rem,calc(100vw-2rem))] rounded-2xl border border-white/15 bg-[#130738]/90 p-4 text-white shadow-lift backdrop-blur-md">
-          <div className="flex items-center justify-between gap-2">
-            <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-white/60">
-              Headline version
-            </p>
-            <button
-              type="button"
-              onClick={() => setShowSwitch(false)}
-              className="rounded-full px-2 py-1 font-mono text-[11px] text-white/70 hover:bg-white/10"
-            >
-              hide
-            </button>
-          </div>
-          <ul className="mt-3 flex flex-col gap-1.5">
+      <DevOverlayStack>
+        <DevOverlay id="copy" title="Headline version">
+          <ul className="flex flex-col gap-1.5">
             {COPY_VARIANTS.map((v, i) => (
               <li key={v.id}>
                 <button
@@ -416,17 +421,17 @@ export function HeroV2() {
                   <span className="block text-[13px] font-semibold">
                     {i + 1}. {v.name}
                   </span>
-                  <span className="mt-0.5 block text-[11px] leading-snug text-white/60">
-                    {v.note}
-                  </span>
+                  <span className="mt-0.5 block text-[11px] leading-snug text-white/60">{v.note}</span>
                 </button>
               </li>
             ))}
           </ul>
-        </div>
-      )}
+        </DevOverlay>
 
-      {tuning && <DotGridTuner config={config} onChange={setConfig} />}
+        <DevOverlay id="grid" title="Dot grid">
+          <DotGridTuner config={config} onChange={setConfig} />
+        </DevOverlay>
+      </DevOverlayStack>
     </>
   );
 }

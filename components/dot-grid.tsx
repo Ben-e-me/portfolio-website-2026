@@ -27,7 +27,7 @@ export const DOT_GRID_DEFAULTS: DotGridConfig = {
   baseColor: "#ffffff",
   baseOpacity: 0.12,
   activeColor: "#09de9f",
-  activeOpacity: 1,
+  activeOpacity: 0,
   proximity: 40,
   speedTrigger: 250,
   maxSpeed: 5000,
@@ -321,14 +321,7 @@ export function DotGridTuner({
   config: DotGridConfig;
   onChange: (c: DotGridConfig) => void;
 }) {
-  const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
-
-  // Open by default on desktop only — on phones the panel would cover the design.
-  useEffect(() => {
-    if (window.innerWidth >= 1024) setOpen(true);
-  }, []);
-
   const snippet = useMemo(() => JSON.stringify(config, null, 2), [config]);
 
   const copy = async () => {
@@ -342,74 +335,57 @@ export function DotGridTuner({
   };
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 w-[min(20rem,calc(100vw-2rem))] rounded-2xl border border-white/15 bg-[#130738]/90 p-4 text-white shadow-lift backdrop-blur-md">
-      <div className="flex items-center justify-between gap-2">
-        <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-white/60">
-          Dot grid
-        </p>
-        <button
-          type="button"
-          onClick={() => setOpen((v) => !v)}
-          className="rounded-full px-2 py-1 font-mono text-[11px] text-white/70 hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/60"
-        >
-          {open ? "hide" : "show"}
-        </button>
+    <>
+      <div className="max-h-[52vh] space-y-2.5 overflow-y-auto pr-1">
+        {SLIDERS.map(({ key, min, max, step }) => (
+          <label key={key} className="block">
+            <span className="flex items-baseline justify-between font-mono text-[11px] text-white/70">
+              {key}
+              <span className="tabular-nums text-white">{config[key] as number}</span>
+            </span>
+            <input
+              type="range"
+              min={min}
+              max={max}
+              step={step}
+              value={config[key] as number}
+              onChange={(e) => onChange({ ...config, [key]: Number(e.target.value) })}
+              className="mt-1 w-full accent-[#09de9f]"
+            />
+          </label>
+        ))}
+
+        <div className="grid grid-cols-2 gap-2 pt-1">
+          {(["baseColor", "activeColor"] as const).map((key) => (
+            <label key={key} className="block">
+              <span className="block font-mono text-[11px] text-white/70">{key}</span>
+              <input
+                type="color"
+                value={config[key]}
+                onChange={(e) => onChange({ ...config, [key]: e.target.value })}
+                className="mt-1 h-8 w-full cursor-pointer rounded-md border border-white/20 bg-transparent"
+              />
+            </label>
+          ))}
+        </div>
       </div>
 
-      {open && (
-        <>
-          <div className="mt-3 max-h-[52vh] space-y-2.5 overflow-y-auto pr-1">
-            {SLIDERS.map(({ key, min, max, step }) => (
-              <label key={key} className="block">
-                <span className="flex items-baseline justify-between font-mono text-[11px] text-white/70">
-                  {key}
-                  <span className="tabular-nums text-white">{config[key] as number}</span>
-                </span>
-                <input
-                  type="range"
-                  min={min}
-                  max={max}
-                  step={step}
-                  value={config[key] as number}
-                  onChange={(e) => onChange({ ...config, [key]: Number(e.target.value) })}
-                  className="mt-1 w-full accent-[#09de9f]"
-                />
-              </label>
-            ))}
-
-            <div className="grid grid-cols-2 gap-2 pt-1">
-              {(["baseColor", "activeColor"] as const).map((key) => (
-                <label key={key} className="block">
-                  <span className="block font-mono text-[11px] text-white/70">{key}</span>
-                  <input
-                    type="color"
-                    value={config[key]}
-                    onChange={(e) => onChange({ ...config, [key]: e.target.value })}
-                    className="mt-1 h-8 w-full cursor-pointer rounded-md border border-white/20 bg-transparent"
-                  />
-                </label>
-              ))}
-            </div>
-          </div>
-
-          <div className="mt-3 flex gap-2">
-            <button
-              type="button"
-              onClick={copy}
-              className="flex-1 rounded-full bg-[#683bff] px-3 py-2 text-[13px] font-semibold hover:bg-[#5a2fe8] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-            >
-              {copied ? "Copied" : "Copy values"}
-            </button>
-            <button
-              type="button"
-              onClick={() => onChange(DOT_GRID_DEFAULTS)}
-              className="rounded-full border border-white/25 px-3 py-2 text-[13px] hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-            >
-              Reset
-            </button>
-          </div>
-        </>
-      )}
-    </div>
+      <div className="mt-3 flex gap-2">
+        <button
+          type="button"
+          onClick={copy}
+          className="flex-1 rounded-full bg-[#683bff] px-3 py-2 text-[13px] font-semibold hover:bg-[#5a2fe8] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+        >
+          {copied ? "Copied" : "Copy values"}
+        </button>
+        <button
+          type="button"
+          onClick={() => onChange(DOT_GRID_DEFAULTS)}
+          className="rounded-full border border-white/25 px-3 py-2 text-[13px] hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+        >
+          Reset
+        </button>
+      </div>
+    </>
   );
 }

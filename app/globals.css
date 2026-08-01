@@ -158,14 +158,19 @@
   --dur-base: 240ms;
   --dur-slow: 380ms;
 
-  /* Hero gradient — indigo · purple · aurora-green */
+  /* Hero gradient — deep indigo-purple field with aurora-green corners.
+     Sharpened against the real landing in W1 (2026-08-01): the M5 baseline
+     rendered far lighter and less saturated than the Figma header. */
+  /* Base wash only. The three accents that must sit behind specific elements
+     (darkener under the copy, green behind the LinkedIn tile, green under the
+     competence row) are blurred elements in <HeroBackground>, positioned in the
+     content container so they track their elements at any aspect ratio. */
   --grad-hero:
-    radial-gradient(45% 70% at 42% 28%, rgba(138, 155, 255, 0.7) 0%, rgba(138, 155, 255, 0.3) 40%, transparent 70%),
-    radial-gradient(40% 65% at 62% 62%, rgba(186, 170, 255, 0.65) 0%, rgba(186, 170, 255, 0.25) 42%, transparent 70%),
-    radial-gradient(95% 130% at -10% 118%, #17d69e 0%, rgba(23, 214, 158, 0.8) 28%, rgba(23, 214, 158, 0.3) 52%, transparent 72%),
-    radial-gradient(95% 120% at -12% -8%, #7a66ff 0%, rgba(122, 102, 255, 0.8) 32%, rgba(122, 102, 255, 0.3) 56%, transparent 76%),
-    radial-gradient(100% 140% at 115% 55%, #6d4cff 0%, rgba(109, 76, 255, 0.8) 30%, rgba(109, 76, 255, 0.28) 54%, transparent 74%),
-    linear-gradient(135deg, #6a7bff 0%, #6b8bff 45%, #3fc8b0 100%);
+    radial-gradient(46% 54% at 74% 42%, rgba(39, 89, 255, 0.55) 0%, rgba(39, 89, 255, 0.2) 46%, transparent 76%),
+    radial-gradient(54% 64% at 44% 42%, rgba(106, 58, 255, 0.8) 0%, rgba(106, 58, 255, 0.3) 50%, transparent 78%),
+    radial-gradient(72% 34% at 24% 0%, rgba(19, 7, 56, 0.38) 0%, transparent 64%),
+    radial-gradient(46% 42% at 2% 100%, rgba(19, 7, 56, 0.34) 0%, transparent 66%),
+    #6a3aff;
 }
 
 /* Dark = provisional scaffold, untuned — light-first for iteration 1 (see design.md) */
@@ -196,6 +201,11 @@
   --sidebar-accent-foreground: #ffffff;
   --sidebar-border: rgba(255, 255, 255, 0.12);
   --sidebar-ring: var(--bene-purple);
+}
+
+@keyframes marquee-x {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
 }
 
 @layer base {

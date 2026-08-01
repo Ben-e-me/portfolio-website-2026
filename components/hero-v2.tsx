@@ -12,20 +12,18 @@ const NAV = [
 /* Drop real SVGs into /public/logos/<file>.svg and add `src` — the wordmark
    fallback keeps the composition readable until then. */
 const CLIENTS: { name: string; src?: string }[] = [
-  { name: "Sparkasse" },
-  { name: "Teufel" },
-  { name: "AOK" },
-  { name: "Domino's" },
-  { name: "Sony Music" },
-  { name: "ERGO" },
-  { name: "Payback" },
+  { name: "Sparkasse", src: "/logos/Sparkasse.svg" },
+  { name: "Teufel", src: "/logos/Teufel.svg" },
+  { name: "AOK", src: "/logos/AOK.svg" },
+  { name: "Domino's", src: "/logos/Dominos.svg" },
+  { name: "Sony Music", src: "/logos/SonyMusic.svg" },
+  { name: "ERGO", src: "/logos/ERGO.svg" },
+  { name: "Payback", src: "/logos/Payback.svg" },
 ];
 
 type Audience = "recruiters" | "businesses";
 
-/* Export the cutout from Figma to /public/portrait.png, then set this to that path.
-   Left null so the layout shows a clean slot instead of a broken image. */
-const PORTRAIT_SRC: string | null = null;
+const PORTRAIT_SRC: string | null = "/portrait.png";
 
 export function HeroV2() {
   const [config, setConfig] = useState<DotGridConfig>(DOT_GRID_DEFAULTS);
@@ -47,9 +45,13 @@ export function HeroV2() {
           {/* glass nav */}
           <header className="flex items-center justify-between gap-6 rounded-pill border border-white/25 bg-white/10 px-5 py-3 backdrop-blur-md sm:px-7">
             <a href="#" className="flex items-center gap-3 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white">
-              <span className="grid h-10 w-10 place-items-center rounded-lg border border-white/40 font-heading text-[15px] font-bold tracking-tight">
-                BE
-              </span>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/logo.svg"
+                alt=""
+                className="h-8 w-auto brightness-0 invert"
+                aria-hidden
+              />
               <span className="hidden leading-tight sm:block">
                 <span className="block text-[15px] font-semibold">Benjamin Erxleben</span>
                 <span className="block text-[13px] text-white/70">Senior Product Designer</span>
@@ -127,26 +129,55 @@ export function HeroV2() {
               <div className="flex flex-wrap items-center gap-3">
                 <a
                   href="#cv"
-                  className="rounded-pill bg-bene-purple px-6 py-3.5 text-[15px] font-semibold text-white shadow-lift transition-colors hover:bg-[#5a2fe8] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+                  className="group inline-flex items-center gap-2.5 rounded-pill bg-bene-purple py-4 pl-5 pr-6 text-[15px] font-semibold text-white shadow-lift transition-all hover:bg-[#5a2fe8] hover:shadow-hero focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
                 >
+                  <svg viewBox="0 0 24 24" fill="none" className="h-[18px] w-[18px]" aria-hidden>
+                    <path
+                      d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z"
+                      fill="currentColor"
+                      opacity=".25"
+                    />
+                    <path
+                      d="M14 3v3a2 2 0 0 0 2 2h3M12 11v6m0 0 2.5-2.5M12 17l-2.5-2.5"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
                   {audience === "recruiters" ? "Download CV" : "See the work"}
                 </a>
+
                 <a
                   href="#contact"
-                  className="rounded-pill border border-white/45 px-6 py-3.5 text-[15px] font-semibold text-white transition-colors hover:bg-white/12 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+                  className="inline-flex items-center gap-2.5 rounded-pill border border-white/45 py-4 pl-6 pr-5 text-[15px] font-semibold text-white transition-colors hover:border-white/70 hover:bg-white/12 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
                 >
                   Book a Call
+                  <svg viewBox="0 0 24 24" fill="none" className="h-[18px] w-[18px]" aria-hidden>
+                    <path
+                      d="M21 11.5a8.38 8.38 0 0 1-9 8.4 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.1A8.38 8.38 0 0 1 4 12a8.5 8.5 0 0 1 8.5-8.5 8.38 8.38 0 0 1 8.5 8Z"
+                      stroke="currentColor"
+                      strokeWidth="1.7"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <circle cx="8.75" cy="12" r="1" fill="currentColor" />
+                    <circle cx="12.25" cy="12" r="1" fill="currentColor" />
+                    <circle cx="15.75" cy="12" r="1" fill="currentColor" />
+                  </svg>
                 </a>
               </div>
             </div>
 
             <div className="relative hidden self-end lg:block">
               {PORTRAIT_SRC ? (
+                /* Sized to run past the section edge so the trust panel crops it,
+                   the way the Figma header does. */
                 /* eslint-disable-next-line @next/next/no-img-element */
                 <img
                   src={PORTRAIT_SRC}
                   alt="Benjamin Erxleben"
-                  className="ml-auto block h-auto w-full max-w-[30rem] select-none object-contain"
+                  className="pointer-events-none ml-auto -mb-6 block h-auto w-full max-w-[34rem] select-none object-contain"
                 />
               ) : (
                 <div className="ml-auto flex h-[26rem] w-full max-w-[30rem] items-end justify-center rounded-t-shell border border-dashed border-white/30 bg-white/5 pb-6 text-small text-white/50">

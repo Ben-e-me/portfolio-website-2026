@@ -19,21 +19,22 @@ export type DotGridConfig = {
   returnDuration: number;
 };
 
+/* Beni's tuned pass, 2026-08-01. */
 export const DOT_GRID_DEFAULTS: DotGridConfig = {
-  dotSize: 4,
-  gap: 46,
-  rotation: 0,
+  dotSize: 3,
+  gap: 18,
+  rotation: -29,
   baseColor: "#ffffff",
-  baseOpacity: 0.28,
+  baseOpacity: 0.2,
   activeColor: "#09de9f",
-  activeOpacity: 0.9,
-  proximity: 100,
-  speedTrigger: 500,
+  activeOpacity: 1,
+  proximity: 40,
+  speedTrigger: 250,
   maxSpeed: 5000,
-  shockRadius: 120,
-  shockStrength: 8.5,
+  shockRadius: 30,
+  shockStrength: 14,
   resistance: 2000,
-  returnDuration: 3,
+  returnDuration: 1,
 };
 
 type Dot = { cx: number; cy: number; ox: number; oy: number; vx: number; vy: number };
@@ -79,21 +80,24 @@ export function DotGrid({
       ctx.scale(dpr, dpr);
     }
 
-    // Oversize the lattice so a rotated grid still covers the corners.
+    // Hexagonal (triangular) packing: every other row is offset by half a cell
+    // and row height is cell * sin(60°). Oversized so rotation still covers the corners.
     const diag = Math.hypot(width, height);
     const cell = dotSize + gap;
-    const cols = Math.ceil(diag / cell) + 2;
-    const rows = Math.ceil(diag / cell) + 2;
+    const rowH = cell * (Math.sqrt(3) / 2);
+    const cols = Math.ceil(diag / cell) + 3;
+    const rows = Math.ceil(diag / rowH) + 3;
 
     const originX = width / 2 - ((cols - 1) * cell) / 2;
-    const originY = height / 2 - ((rows - 1) * cell) / 2;
+    const originY = height / 2 - ((rows - 1) * rowH) / 2;
 
     const dots: Dot[] = [];
     for (let y = 0; y < rows; y++) {
+      const stagger = (y % 2) * (cell / 2);
       for (let x = 0; x < cols; x++) {
         dots.push({
-          cx: originX + x * cell,
-          cy: originY + y * cell,
+          cx: originX + x * cell + stagger,
+          cy: originY + y * rowH,
           ox: 0,
           oy: 0,
           vx: 0,

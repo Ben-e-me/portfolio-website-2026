@@ -19,20 +19,20 @@ export type DotGridConfig = {
   returnDuration: number;
 };
 
-/* Beni's tuned pass, 2026-08-01. */
+/* Beni's tuned pass, 2026-08-01 (second round). */
 export const DOT_GRID_DEFAULTS: DotGridConfig = {
-  dotSize: 3,
-  gap: 18,
-  rotation: -29,
+  dotSize: 2.5,
+  gap: 12,
+  rotation: -30,
   baseColor: "#ffffff",
-  baseOpacity: 0.2,
+  baseOpacity: 0.12,
   activeColor: "#09de9f",
   activeOpacity: 1,
   proximity: 40,
   speedTrigger: 250,
   maxSpeed: 5000,
-  shockRadius: 30,
-  shockStrength: 14,
+  shockRadius: 200,
+  shockStrength: 2,
   resistance: 2000,
   returnDuration: 1,
 };

@@ -317,8 +317,13 @@ export function DotGridTuner({
   config: DotGridConfig;
   onChange: (c: DotGridConfig) => void;
 }) {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  // Open by default on desktop only — on phones the panel would cover the design.
+  useEffect(() => {
+    if (window.innerWidth >= 1024) setOpen(true);
+  }, []);
 
   const snippet = useMemo(() => JSON.stringify(config, null, 2), [config]);
 

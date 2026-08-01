@@ -123,9 +123,10 @@ function useScrollFade() {
 export function HeroV2() {
   const [config, setConfig] = useState<DotGridConfig>(DOT_GRID_DEFAULTS);
   const [audience, setAudience] = useState(0);
+  const [navActive, setNavActive] = useState(0);
   const [variant, setVariant] = useState(0);
 
-  const nav = useSlidingUnderline<HTMLElement>(0);
+  const nav = useSlidingUnderline<HTMLElement>(navActive);
   const aud = useSlidingUnderline<HTMLDivElement>(audience);
   const { panelRef, register } = useScrollFade();
 
@@ -148,18 +149,27 @@ export function HeroV2() {
 
         {/* Content-tracked accents. Blurred ellipses like the Figma layer stack,
             positioned inside the 1200 column so they stay behind the elements
-            they belong to at any aspect ratio. */}
+            they belong to at any aspect ratio. Sits before the dot grid in the
+            DOM, so the grid draws on top — including over the darkener. */}
         <div className="pointer-events-none absolute inset-0 flex justify-center overflow-hidden">
           <div className="relative h-full w-full max-w-[1200px] px-8">
-            {/* Figma "Accent Linkedin" — behind the tile, up and right of it */}
+            {/* Figma "Accent Linkedin" — a circle, not an ellipse, so it keeps
+                its shape at any ratio. Up and right of the tile. */}
             <div
-              className="absolute right-[-3%] top-[-16%] h-[46vh] w-[26%] rounded-full"
-              style={{ background: "rgba(12,208,150,0.85)", filter: "blur(110px)" }}
+              className="absolute right-[-3%] top-[-16%] aspect-square w-[34%] -translate-y-[60px] translate-x-[60px] rounded-full"
+              style={{ background: "rgba(12,208,150,0.70)", filter: "blur(120px)" }}
             />
-            {/* Figma "Accent KPIs" — width of the competence row */}
+            {/* Figma "Accent KPIs" — carries the width of the competence row */}
             <div
-              className="absolute bottom-[70px] left-16 h-[22vh] w-[460px] max-w-[48%] rounded-full"
-              style={{ background: "rgba(9,222,159,0.93)", filter: "blur(100px)" }}
+              className="absolute bottom-[10px] left-10 h-[24vh] w-[680px] max-w-[62%] rounded-full"
+              style={{ background: "rgba(9,222,159,0.75)", filter: "blur(110px)" }}
+            />
+            {/* Content darkener. Lives here rather than inside the copy block so
+                it never takes part in the scroll fade — the background must stay
+                constant while only the content recedes. */}
+            <div
+              className="absolute left-10 top-1/2 h-[62%] w-[72%] -translate-y-1/2 rounded-full"
+              style={{ background: "rgba(19,7,56,0.8)", filter: "blur(90px)" }}
             />
           </div>
         </div>
@@ -172,13 +182,18 @@ export function HeroV2() {
             face. Head reads ~32% of the hero there, which puts this image at
             ~60% of hero height with the hair starting ~27% down. Full aspect,
             no side crop; bleeds right and is cut at the bottom by the panel. */}
-        <div className="pointer-events-none absolute inset-x-0 top-[27%] hidden h-[60%] justify-center lg:flex">
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 top-[17%] hidden justify-center lg:flex">
           <div className="relative w-full max-w-[1200px] px-8">
+            {/* Runs to the bottom of the hero so the shoulders stay visible in
+                the gaps beside the panel's rounded top corners. Rotated 3.5deg
+                like the Figma, which pulls more of the shoulder in on the right
+                and keeps the neckline out from under the panel. */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/portrait.png"
               alt="Benjamin Erxleben"
-              className="absolute right-[-16%] top-0 h-full w-auto max-w-none select-none object-contain"
+              className="absolute right-[-22%] top-0 h-full w-auto max-w-none select-none object-contain"
+              style={{ transform: "rotate(3.5deg)", transformOrigin: "bottom right" }}
             />
           </div>
         </div>
@@ -187,17 +202,17 @@ export function HeroV2() {
           <header
             className="relative flex h-[66px] shrink-0 items-center justify-between rounded-[16px] border border-white/20 px-[17px] backdrop-blur-[50px]"
             style={{
-              background: "rgba(19, 7, 56, 0.10)",
-              boxShadow: "0 0 24px rgba(19, 7, 56, 0.20)",
+              background: "rgba(19, 7, 56, 0.18)",
+              boxShadow: "0 2px 32px rgba(19, 7, 56, 0.30)",
             }}
           >
             <a href="#" className={`flex items-center gap-[18px] pl-0.5 ${focus}`}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/logo.svg" alt="" aria-hidden className="h-8 w-[46px] brightness-0 invert" />
-              <span className="hidden flex-col gap-1.5 leading-none sm:flex">
-                <span className="text-[17px] font-medium leading-none">Benjamin Erxleben</span>
-                <span className="text-[16px] font-normal leading-none text-white/50">
-                  Senior Product Designer
+              <span className="hidden flex-col gap-0.5 leading-none sm:flex">
+                <span className="text-[17px] font-[520] leading-none">Benjamin Erxleben</span>
+                <span className="text-[16px] font-[380] leading-none text-white/50">
+                  Digital Product Designer
                 </span>
               </span>
             </a>
@@ -215,8 +230,10 @@ export function HeroV2() {
                   key={item.label}
                   data-underline-item
                   href={item.href}
+                  onClick={() => setNavActive(i)}
+                  aria-current={navActive === i ? "page" : undefined}
                   className={`flex h-full items-center text-[18px] uppercase leading-none tracking-[0.16em] transition-colors ${focus} ${
-                    i === 0 ? "text-white" : "text-white/35 hover:text-white/70"
+                    navActive === i ? "font-[520] text-white" : "text-white/35 hover:text-white/70"
                   }`}
                 >
                   {item.label}
@@ -251,7 +268,9 @@ export function HeroV2() {
                     onClick={() => setAudience(i)}
                     aria-pressed={audience === i}
                     className={`flex h-full items-center transition-colors ${focus} ${
-                      audience === i ? "text-white" : "text-white/35 hover:text-white/70"
+                      audience === i
+                        ? "font-[560] text-white"
+                        : "font-[430] text-white/35 hover:text-white/70"
                     }`}
                   >
                     {a.label}
@@ -263,13 +282,6 @@ export function HeroV2() {
 
             {/* Headline, subline and CTAs fade as one group */}
             <div ref={register} className="relative flex max-w-[626px] flex-col gap-10">
-              {/* Darkener bound to this block, so it always sits under the copy */}
-              <div
-                aria-hidden
-                className="pointer-events-none absolute -inset-x-[32%] -inset-y-[75%] -z-10 rounded-full"
-                style={{ background: "rgba(19,7,56,0.8)", filter: "blur(90px)" }}
-              />
-
               <div className="flex flex-col gap-8">
                 <h1 className="flex items-center gap-1.5 text-[clamp(2.25rem,4.6vw,3.5rem)] font-medium leading-none tracking-[-0.01em] text-white/[0.45] text-balance">
                   {copy.headline.lead}
@@ -306,7 +318,7 @@ export function HeroV2() {
 
                 <a
                   href="#contact"
-                  className={`group relative inline-flex h-[46px] items-center gap-2.5 overflow-hidden rounded-[8px] border-[1.5px] border-white bg-white/[0.01] px-5 text-[20px] font-medium text-white backdrop-blur-[14px] transition-[transform,background-color] duration-200 hover:-translate-y-0.5 hover:bg-white/15 active:translate-y-0 active:bg-white/25 ${focus}`}
+                  className={`group relative inline-flex h-[46px] items-center gap-2.5 overflow-hidden rounded-[8px] border border-white/45 bg-white/[0.01] px-5 text-[20px] font-medium text-white backdrop-blur-[14px] transition-[transform,background-color,border-color] duration-200 hover:-translate-y-0.5 hover:border-white/70 hover:bg-white/15 active:translate-y-0 active:bg-white/25 ${focus}`}
                   style={{ boxShadow: "0 8px 50px rgba(19, 7, 56, 0.20)" }}
                 >
                   <span

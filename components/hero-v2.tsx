@@ -3,8 +3,9 @@
 import { useEffect, useState } from "react";
 import { DotGrid, DotGridTuner, DOT_GRID_DEFAULTS, type DotGridConfig } from "@/components/dot-grid";
 
-/* Values below are read off the Figma artboard "Landing / Home" (117:82) via figma-cli.
-   Design width is 1200 with a 1136 content column (32px gutters). */
+/* Every value below is read off the Figma artboard "Landing / Home" (117:82)
+   via figma-cli. Design width 1200, content column 1136 (32px gutters).
+   Hero auto-layout: padding 64 / 0 / 40 / 80, space-between. */
 
 const NAV = [
   { label: "Home", href: "#" },
@@ -12,24 +13,58 @@ const NAV = [
   { label: "AI", href: "#ai" },
 ];
 
+/* Figma "Frame 362" — no card backgrounds, hairline dividers between entries. */
 const STATS = [
-  { value: "20", sup: "yrs", label: "Design Experience" },
-  { value: "2", sup: "", label: "Design Degrees" },
-  { value: "20", sup: "+", label: "Happy Clients" },
-  { value: "60", sup: "+", label: "successful Projects" },
+  { value: "20", quant: "yrs", label: "Design Experience" },
+  { value: "2", quant: "", label: "Degrees" },
+  { value: "20", quant: "+", label: "Clients" },
+  { value: "60", quant: "+", label: "Projects" },
 ];
 
+/* Order taken from the Figma "Client Logos" row. */
 const CLIENTS = [
-  { name: "Sparkasse", src: "/logos/Sparkasse.svg" },
-  { name: "Teufel", src: "/logos/Teufel.svg" },
-  { name: "AOK", src: "/logos/AOK.svg" },
-  { name: "Domino's", src: "/logos/Dominos.svg" },
-  { name: "Sony Music", src: "/logos/SonyMusic.svg" },
-  { name: "ERGO", src: "/logos/ERGO.svg" },
-  { name: "Payback", src: "/logos/Payback.svg" },
+  "Sparkasse",
+  "Teufel",
+  "AOK",
+  "Dominos",
+  "SonyMusic",
+  "ERGO",
+  "Payback",
+  "BerlinChemie",
+  "CaraCare",
+  "DojoMadness",
+  "Wefox",
 ];
 
 type Audience = "recruiters" | "businesses";
+
+const AUDIENCES: { key: Audience; label: string }[] = [
+  { key: "recruiters", label: "For Recruiters" },
+  { key: "businesses", label: "For Businesses" },
+];
+
+/* Figma: underline sits 12px inside each edge, radius 20. Thickness raised from
+   the file's 1px to 2px on Beni's note that it reads too weak on screen. */
+function Underlined({
+  active,
+  children,
+}: {
+  active: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <span className="flex flex-col items-stretch">
+      <span className={active ? "font-medium" : ""}>{children}</span>
+      <span className="flex px-3 pt-2">
+        <span
+          className={`h-0.5 w-full rounded-full bg-white transition-opacity duration-200 ${
+            active ? "opacity-100" : "opacity-0"
+          }`}
+        />
+      </span>
+    </span>
+  );
+}
 
 export function HeroV2() {
   const [config, setConfig] = useState<DotGridConfig>(DOT_GRID_DEFAULTS);
@@ -40,46 +75,58 @@ export function HeroV2() {
     setTuning(new URLSearchParams(window.location.search).has("tune"));
   }, []);
 
+  const focus =
+    "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white";
+
   return (
     <>
-      {/* Hero is pinned; the content panel below scrolls up over it. */}
       <section className="sticky top-0 h-svh overflow-hidden text-white">
         <div className="absolute inset-0" style={{ background: "var(--grad-hero)" }} />
         <DotGrid config={config} />
 
+        {/* Portrait — Figma frame is 407x483 in a 694-tall hero (70%), bottom-anchored. */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-[120px] hidden justify-center lg:flex">
+          <div className="flex w-full max-w-[1200px] justify-end px-8">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/portrait.png"
+              alt="Benjamin Erxleben"
+              className="h-auto w-[min(34vw,430px)] max-w-none select-none object-contain"
+            />
+          </div>
+        </div>
+
         <div className="relative mx-auto flex h-full max-w-[1200px] flex-col px-8 pt-8">
-          {/* Top nav — Figma: 1136x66, r16, #130738 @10%, 1px stroke, glass blur, soft shadow */}
+          {/* Top nav — Figma: 1136x66, r16, #130738 @10%, 1px stroke, glass, 24px shadow */}
           <header
-            className="flex h-[66px] shrink-0 items-center justify-between gap-6 rounded-[16px] border border-white/20 px-[17px] backdrop-blur-[50px]"
+            className="relative flex h-[66px] shrink-0 items-center justify-between rounded-[16px] border border-white/20 px-[17px] backdrop-blur-[50px]"
             style={{
               background: "rgba(19, 7, 56, 0.10)",
               boxShadow: "0 0 24px rgba(19, 7, 56, 0.20)",
             }}
           >
-            <a
-              href="#"
-              className="flex items-center gap-[18px] pl-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
-            >
+            <a href="#" className={`flex items-center gap-[18px] pl-0.5 ${focus}`}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/logo.svg" alt="" aria-hidden className="h-8 w-[46px] brightness-0 invert" />
-              <span className="hidden leading-tight sm:block">
-                <span className="block text-[15px] font-semibold">Benjamin Erxleben</span>
-                <span className="block pt-1.5 text-[13px] text-white/70">Senior Product Designer</span>
+              <span className="hidden flex-col gap-1.5 leading-none sm:flex">
+                <span className="text-[17px] font-medium leading-none">Benjamin Erxleben</span>
+                <span className="text-[16px] font-normal leading-none text-white/50">
+                  Senior Product Designer
+                </span>
               </span>
             </a>
 
-            <nav className="hidden items-center gap-8 md:flex">
+            {/* Absolutely centred in the bar, not balanced between logo and icon */}
+            <nav className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-8 md:flex">
               {NAV.map((item, i) => (
                 <a
                   key={item.label}
                   href={item.href}
-                  className={`text-[18px] uppercase leading-none tracking-[0.16em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white ${
-                    i === 0
-                      ? "font-medium underline underline-offset-[10px]"
-                      : "text-white/75 hover:text-white"
+                  className={`text-[18px] uppercase leading-none tracking-[0.16em] transition-colors ${focus} ${
+                    i === 0 ? "" : "text-white/75 hover:text-white"
                   }`}
                 >
-                  {item.label}
+                  <Underlined active={i === 0}>{item.label}</Underlined>
                 </a>
               ))}
             </nav>
@@ -89,65 +136,39 @@ export function HeroV2() {
               target="_blank"
               rel="noreferrer"
               aria-label="LinkedIn"
-              className="grid h-8 w-8 shrink-0 place-items-center rounded-[8px] bg-white text-ink transition-transform hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+              className={`shrink-0 transition-transform hover:scale-105 ${focus}`}
             >
-              <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4" aria-hidden>
-                <path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5ZM3 9h4v12H3V9Zm7 0h3.8v1.7h.05a4.2 4.2 0 0 1 3.75-2c4 0 4.75 2.5 4.75 5.8V21h-4v-5.6c0-1.35-.03-3.1-1.9-3.1-1.9 0-2.2 1.48-2.2 3v5.7h-4V9Z" />
-              </svg>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/icons/logo_linked-in.svg" alt="" aria-hidden className="h-8 w-8" />
             </a>
           </header>
 
-          {/* Hero body */}
-          {/* Figma indents the hero body 80px inside the 1136 column */}
-          <div className="grid min-h-0 flex-1 grid-cols-1 items-center gap-8 lg:grid-cols-[minmax(0,637px)_minmax(0,1fr)] lg:pl-20">
-            <div className="flex flex-col gap-10 pb-8">
-              {/* Audience selector — Figma: 20px, active SemiBold + 2px rule, 4px dot divider */}
-              <div className="flex items-center gap-3 text-[20px] leading-[1.4]">
-                <button
-                  type="button"
-                  onClick={() => setAudience("recruiters")}
-                  aria-pressed={audience === "recruiters"}
-                  className="focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
-                >
-                  <span className={audience === "recruiters" ? "font-semibold" : "text-white/70"}>
-                    For Recruiters
-                  </span>
-                  <span
-                    className={`mt-1 block h-0.5 rounded-full bg-white transition-opacity ${
-                      audience === "recruiters" ? "opacity-100" : "opacity-0"
-                    }`}
-                  />
-                </button>
+          {/* Hero body — Figma auto-layout: pt 64, pb 40, pl 80, space-between.
+              Extra 120px bottom keeps the competence row clear of the panel. */}
+          <div className="flex min-h-0 flex-1 flex-col justify-between pb-[160px] pt-16 lg:pl-20">
+            {/* Audience selector — 20px, active SemiBold, 4px dot divider */}
+            <div className="flex shrink-0 items-center gap-3 text-[20px] leading-none">
+              {AUDIENCES.map((a, i) => (
+                <span key={a.key} className="flex items-center gap-3">
+                  {i > 0 && <span aria-hidden className="h-1 w-1 rounded-full bg-white" />}
+                  <button
+                    type="button"
+                    onClick={() => setAudience(a.key)}
+                    aria-pressed={audience === a.key}
+                    className={`${focus} ${audience === a.key ? "" : "text-white/70"}`}
+                  >
+                    <Underlined active={audience === a.key}>{a.label}</Underlined>
+                  </button>
+                </span>
+              ))}
+            </div>
 
-                <span aria-hidden className="h-1 w-1 shrink-0 rounded-full bg-white" />
-
-                <button
-                  type="button"
-                  onClick={() => setAudience("businesses")}
-                  aria-pressed={audience === "businesses"}
-                  className="focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
-                >
-                  <span className={audience === "businesses" ? "font-semibold" : "text-white/70"}>
-                    For Businesses
-                  </span>
-                  <span
-                    className={`mt-1 block h-0.5 rounded-full bg-white transition-opacity ${
-                      audience === "businesses" ? "opacity-100" : "opacity-0"
-                    }`}
-                  />
-                </button>
-              </div>
-
+            {/* Copy & CTA — Figma gap 40, inner copy gap 32 */}
+            <div className="flex max-w-[626px] flex-col gap-10">
               <div className="flex flex-col gap-8">
-                {/* H1 — Figma: 56px Medium, white at 45% opacity, arrow is a 5.5px stroked vector */}
                 <h1 className="flex items-center gap-1.5 text-[clamp(2.25rem,4.6vw,3.5rem)] font-medium leading-none tracking-[-0.01em] text-white/[0.45]">
                   0
-                  <svg
-                    viewBox="0 0 23 22"
-                    fill="none"
-                    className="h-[0.4em] w-auto shrink-0"
-                    aria-hidden
-                  >
+                  <svg viewBox="0 0 23 22" fill="none" className="h-[0.4em] w-auto shrink-0" aria-hidden>
                     <path
                       d="M1 11h20M13 3l8 8-8 8"
                       stroke="currentColor"
@@ -159,11 +180,7 @@ export function HeroV2() {
                   <span className="sr-only">to</span>1 Product Design
                 </h1>
 
-                {/* Subline — Figma: 24px / 140%, dark glow behind for legibility */}
-                <p
-                  className="max-w-[626px] text-[clamp(1.0625rem,1.7vw,1.5rem)] leading-[1.4]"
-                  style={{ textShadow: "0 0 120px rgba(19, 7, 56, 1)" }}
-                >
+                <p className="text-[clamp(1.0625rem,1.7vw,1.5rem)] leading-[1.4]">
                   I&rsquo;m <strong className="font-semibold">Benjamin</strong>. End-to-end hands-on
                   IC, <strong className="font-semibold">AI-native</strong>, at home in{" "}
                   <strong className="font-semibold">B2C SaaS</strong> and regulated,{" "}
@@ -171,101 +188,110 @@ export function HeroV2() {
                 </p>
               </div>
 
-              {/* Buttons — Figma: h46, r8, pad 9/20, 20px Medium */}
+              {/* CTAs — Figma "Frame 7": purple + 70% green radial fill, r8, h46, pad 9/20 */}
               <div className="flex flex-wrap items-center gap-4">
                 <a
                   href="#cv"
-                  className="inline-flex h-[46px] items-center gap-2 rounded-[8px] bg-bene-purple px-5 text-[20px] font-medium text-white transition-colors hover:bg-[#5a2fe8] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
-                  style={{ boxShadow: "0 0 50px rgba(19, 7, 56, 0.45)" }}
+                  className={`relative inline-flex h-[46px] items-center gap-3 overflow-hidden rounded-[8px] bg-bene-purple px-5 text-[20px] font-medium text-white ${focus}`}
+                  style={{ boxShadow: "0 8px 50px rgba(19, 7, 56, 0.20)" }}
                 >
-                  <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5 shrink-0" aria-hidden>
-                    <path
-                      d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z"
-                      fill="currentColor"
-                      opacity=".25"
-                    />
-                    <path
-                      d="M14 3v3a2 2 0 0 0 2 2h3M12 11v6m0 0 2.5-2.5M12 17l-2.5-2.5"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                  {audience === "recruiters" ? "Download CV" : "See the work"}
+                  <span
+                    aria-hidden
+                    className="pointer-events-none absolute inset-0"
+                    style={{
+                      background:
+                        "radial-gradient(100% 120% at 100% 133%, rgba(12,208,150,0.7) 0%, rgba(12,208,150,0) 100%)",
+                    }}
+                  />
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src="/icons/Icon_Download_Page.svg"
+                    alt=""
+                    aria-hidden
+                    className="relative h-5 w-auto brightness-0 invert"
+                  />
+                  <span className="relative">
+                    {audience === "recruiters" ? "Download CV" : "See the work"}
+                  </span>
                 </a>
 
                 <a
                   href="#contact"
-                  className="inline-flex h-[46px] items-center gap-2.5 rounded-[8px] border-[1.5px] border-white bg-white/[0.01] px-5 text-[20px] font-medium text-white transition-colors hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+                  className={`inline-flex h-[46px] items-center gap-2.5 rounded-[8px] border-[1.5px] border-white bg-white/[0.01] px-5 text-[20px] font-medium text-white transition-colors hover:bg-white/10 ${focus}`}
                 >
                   Book a Call
-                  <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5 shrink-0" aria-hidden>
-                    <path
-                      d="M21 11.5a8.38 8.38 0 0 1-9 8.4 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.1A8.38 8.38 0 0 1 4 12a8.5 8.5 0 0 1 8.5-8.5 8.38 8.38 0 0 1 8.5 8Z"
-                      stroke="currentColor"
-                      strokeWidth="1.7"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <circle cx="8.75" cy="12" r="1" fill="currentColor" />
-                    <circle cx="12.25" cy="12" r="1" fill="currentColor" />
-                    <circle cx="15.75" cy="12" r="1" fill="currentColor" />
-                  </svg>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src="/icons/Icon_Call.svg"
+                    alt=""
+                    aria-hidden
+                    className="h-5 w-auto brightness-0 invert"
+                  />
                 </a>
               </div>
+            </div>
 
-              {/* Competence cards — Figma: 144x82, r11, white @10%, label 10px @40% */}
-              <ul className="flex gap-5">
-                {STATS.map((s) => (
-                  <li
-                    key={s.label}
-                    className="flex h-[82px] w-[144px] flex-col justify-between rounded-[11px] bg-white/10 p-[13px]"
-                  >
-                    <span className="text-[28px] font-semibold leading-none">
-                      {s.value}
-                      {s.sup && <sup className="ml-0.5 text-[14px] font-medium">{s.sup}</sup>}
+            {/* Competence row — Figma "Frame 362": no boxes, 1x31 dividers at 40% */}
+            <ul className="flex shrink-0 items-center gap-[26px]">
+              {STATS.map((s, i) => (
+                <li key={s.label} className="flex items-center gap-[26px]">
+                  {i > 0 && <span aria-hidden className="h-[31px] w-px bg-white/40" />}
+                  <span className="flex flex-col items-center gap-2">
+                    <span className="flex items-start leading-none">
+                      <span className="text-[35px] font-semibold leading-none">{s.value}</span>
+                      {s.quant && (
+                        <span className="text-[20px] font-semibold leading-none">{s.quant}</span>
+                      )}
                     </span>
-                    <span className="text-[10px] leading-none text-white/40">{s.label}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Portrait — Figma: 407x483, bottom-anchored right */}
-            <div className="relative hidden h-full items-end justify-end lg:flex">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/portrait.png"
-                alt="Benjamin Erxleben"
-                className="pointer-events-none block h-auto w-full max-w-[30rem] translate-x-8 select-none object-contain"
-              />
-            </div>
+                    <span className="text-[12px] font-normal leading-none">{s.label}</span>
+                  </span>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </section>
 
-      {/* Content panel — full-bleed, rides up over the pinned hero on scroll */}
-      <div className="relative z-10 rounded-t-section bg-background text-ink shadow-[0_-24px_60px_-24px_rgba(19,7,56,0.35)]">
-        <div className="mx-auto max-w-[1200px] px-8 py-14">
+      {/* Trust panel — full-bleed, already peeking at load, rides up over the pinned hero */}
+      <div className="relative z-10 -mt-[120px] rounded-t-section bg-background text-ink shadow-[0_-24px_60px_-24px_rgba(19,7,56,0.35)]">
+        <div className="py-14">
           <p className="text-center text-small text-ink-subtle">Trusted by</p>
-          <ul className="mt-8 flex flex-wrap items-center justify-center gap-x-12 gap-y-7 opacity-70 grayscale">
-            {CLIENTS.map((c) => (
-              <li key={c.name}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={c.src} alt={c.name} className="h-7 w-auto object-contain" />
-              </li>
-            ))}
-          </ul>
 
-          {/* Placeholder length so the scroll-over behaviour is testable. */}
-          <div className="mt-20 grid gap-6 pb-40 md:grid-cols-3">
+          {/* Marquee — duplicated track, translated 50% for a seamless loop */}
+          <div
+            className="group mt-8 overflow-hidden"
+            style={{
+              maskImage:
+                "linear-gradient(90deg, transparent, black 8%, black 92%, transparent)",
+              WebkitMaskImage:
+                "linear-gradient(90deg, transparent, black 8%, black 92%, transparent)",
+            }}
+          >
+            <ul
+              className="flex w-max items-center gap-16 opacity-70 grayscale motion-reduce:animate-none"
+              style={{ animation: "marquee-x 45s linear infinite" }}
+            >
+              {[...CLIENTS, ...CLIENTS].map((name, i) => (
+                <li key={`${name}-${i}`} className="shrink-0">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={`/logos/${name}.svg`}
+                    alt={i < CLIENTS.length ? name : ""}
+                    aria-hidden={i >= CLIENTS.length}
+                    className="h-7 w-auto object-contain"
+                  />
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Placeholder length so the scroll-over is testable */}
+          <div className="mx-auto mt-20 grid max-w-[1200px] gap-6 px-8 pb-40 md:grid-cols-3">
             {["Selected Work", "Approach", "Get in touch"].map((t) => (
               <div key={t} className="rounded-card bg-card p-8 shadow-card">
                 <h2 className="text-h4 font-semibold">{t}</h2>
                 <p className="mt-3 text-body text-ink-muted">
-                  Section placeholder — here so the panel has enough length to scroll over the
-                  pinned hero.
+                  Section placeholder — here so the panel has length to scroll over the pinned hero.
                 </p>
               </div>
             ))}

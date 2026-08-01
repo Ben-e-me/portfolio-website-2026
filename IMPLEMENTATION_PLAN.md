@@ -2,7 +2,7 @@
 
 > Master Plan: `../project files/master-plan.md`
 > Time horizon: ~4–8 weeks part-time
-> Current status: **M4-HL done (2026-06-22)** · quickfix dev-sprint → M5 next
+> Current status (**2026-08-01**): **Phase A closed.** M5 baseline done (merged 2026-07-07). **M6-T cancelled** after three failed tool rounds — see `decisions.md`. Project is now in **W1 Landing, running section by section, content-first**. Next concrete step: positioning sharpening (capped) → landing copy → hero end-to-end.
 > Approach (2026-06-22): **Option C + 80/20.** Foundation-Prozess wie geplant, aber jedes Milestone als "good enough für Iteration 1" gescoped — live bei W1 lernen, Learnings in Folge-Schleifen einarbeiten.
 
 ---
@@ -29,7 +29,8 @@ Ziel: aus dem Research-Heavy-Teil raus, schnell eine Live-Baseline, dann datenge
 | **M3** Status-Quo Assessment | **done** 2026-06-02 | Scope erweitert auf **alle 8 existierenden Seiten deep** (Beni-Entscheidung), gescort durch 4-POV-Audience-Raster (Recruiter+Design-Lead primär). Output: `research/assessment.md` (Raster → 8 Seiten-Assessments → Case-Roster + Inventar → Wefox-Teaser → M3-Synthese). Key: Sitemap-Move (About slimmt + neue Approach/Behind-the-Build-Page), Case-Roster 4→3, Titel-Vereinheitlichung, Quick-Read-Layer als Hebel, GDPR-Fix. |
 | **M4-HL** Content & IA High-Level | **done** 2026-06-22 | Output: `../content/sitemap.md`. Locked: Sitemap+URLs · Nav (Home→Approach/AI→About→Cases) · Titel-Architektur (Need-USP-H1 + "Senior" als ATS-Tag in Subline/meta; empirisch via Competitor-Check) · 3-URL-Audience-Model · Landing Source-of-Truth (6 Sektionen) · Per-Page-Spines · Brief-Template. Capability=Teaser, Roster 3, Philosophy re-destilliert, `/build` routet auf Approach. GDPR: no banner, Clarity removed. Tentativer W2↔W3-Swap. Finale Copy → W1. |
 | **M5** Design System | **baseline done** (2026-06-22) | **✓ Encoded:** `app/globals.css` (BenE brand married into shadcn semantic tokens + bene-extended tokens: iceberg accents · ink steps · 80px-radii · purple shadows · motion · hero gradient; light-first / dark-ready provisional `.dark`) · `app/layout.tsx` (Outfit variable via next/font + Senior-PD meta) · `design.md` (human-readable single source, no Chameleon voice). `next build` clean, type-checked. Gap-check vs 6 Landing-Sektionen: Tokens decken alles; offene Punkte (logo-greyscale, stat-canvas, card-hover) sind Component/Wave-Arbeit, keine Token-Lücken. **Remaining:** reference-analysis (marco/briidge/agentur/jonah) → Motion/Composition in M6-T/Waves · "sharpen tokens vs real landing" → W1. — Original scope: **Intake → design.md baseline → Tailwind v4 `@theme`.** ⚑ **Intake-Befund:** `_input/BenE Design System.zip` (Claude-Design export) ist ein **near-complete token set** — `colors_and_type.css` enthält bereits Colors (brand + iceberg accents + neutrals + semantic fg/bg) · Type (sizes/line-heights/weights, Outfit) · Radii (8-step) · purple-tinted Shadows · Spacing (10-step) · Motion (easings+durations) · Gradients · Component-Primitives (card/btn/tag/icon-ring/section-shell). **80/20: Token-Arbeit ist ~80% erledigt.** Dial = **anchor-heavy auf Base-Tokens; evolve nur Motion/Layering/Composition.** Scope-creep-Risiko kippt → **nicht über-polieren / Tokens nicht grundlos neu aufmachen.** **Restarbeit:** (1) Benis Review Palette+Type + 3 Inkonsistenzen lösen (Body-Indigo `#0D0726` CSS vs `#130738` README · Display-Weight 700 CSS vs 800 README · static vs variable Outfit) (2) stale Chameleon-Ära-Voice aus README **nicht** mitnehmen — nur Tokens + Visual Foundations; Voice = neu (M2 Product/Brand/AI) (3) dark-ready semantic Layer + Tailwind-v4-`@theme`-Encoding + design.md (4) Gap-Check vs Landing. **Locked decisions:** Dark mode = **light-first it.1, token layer dark-ready** (semantic CSS vars, kein Dark-Theme gebaut, nicht blocken). figma-cli = **skip now**; reconsider M6 / W2–W3 wenn Pencil.dev nicht passt (tooling-competence + mittelfristig wertvoll für AI/"how I AI"-Story; main+AI-page velocity wins). **Reference analysis (design feel + motion, NICHT base tokens):** [marco.fyi/.os](https://www.marco.fyi/) primary · [briidge.app](https://www.briidge.app/) · [agentur-consulting.de](https://agentur-consulting.de/) (glass top-nav · scrolling logos · scroll-storytelling · scroll/click-animated boxes · KPI presentation · mouse-reactive bg · subtle 3D founder-card; IA/page-build = later reference). THEN sharpen tokens against the real landing. |
-| **M6-T** Concept Design Templates | pending | Pencil.dev for 2 hero page archetypes. 4-POV review. |
+| ~~**M6-T** Concept Design Templates~~ | **CANCELLED 2026-08-01** | Pencil.dev for 2 hero page archetypes. 4-POV review. Two earlier rounds (Claude Design/Fable 5 solo draft + Pencil via Claude Code MCP faithful-replica build) showed visual drift too high to be useful as-is — see `decisions.md`. A third round (Google Stitch → Claude Design, screenshot-fed) was run and **also failed**: output drifted from the design language even with screenshots, token handover after a design-system extraction, and project alignment context supplied. **Dropped, not deferred (2026-08-01).** Two independent causes compounded — (a) a content vacuum, since M4-HL deferred all copy to W1, so every round was fed structure without words, and (b) genuine design-language drift that tokens and screenshots did not fix. Counter-evidence: Beni iterated the hero successfully and faster in Figma, then stalled exactly where known content ran out. **Replacement:** visual work moves inside W1, section by section, on real copy. See `decisions.md` 2026-08-01. |
+| ~~**M-PERF** Performance Audit & Rewrite Assessment~~ | **cancelled (2026-07-07)** | Lag hypothesis disproven — loading issues traced to Zen Browser specifically (long session, many tabs open), not a cross-browser or site-wide problem. Safari + Chrome perform fine. No rewrite/audit needed. |
 
 ---
 
@@ -37,17 +38,25 @@ Ziel: aus dem Research-Heavy-Teil raus, schnell eine Live-Baseline, dann datenge
 
 > **Revised post-M3 (2026-06-02).** Roster 4→3 Cases; SafetyWing + Wefox als Cases gedroppt (Wefox → Teaser-Card in Portfolio, kein Detail); NEUE Approach/Behind-the-Build-Page (Philosophy + Workflow + Services-Essenz + AI). Exakte Wave-Reihenfolge (v.a. Approach-Page-Platzierung) wird in M4-HL final bestätigt.
 
+> **Re-numbered 2026-08-01** — About cut as a standalone page (folded into the Landing's Credibility section). 9 waves → **8**. The tentative W2↔W3 swap resolves for free: Approach is simply W2. See `decisions.md` + `content/sitemap.md`.
+
 | Wave | Page | Branch | Status |
 |---|---|---|---|
-| W1 | Index / Landing | `feature/index-overhaul` | pending |
-| W2 | About (slimmed: Hero → Career + Clients → Backstory → CTA) | `feature/about-overhaul` | pending |
-| W3 | **Approach / Behind the Build** (NEU — Philosophy + Workflow + Services-Essenz + AI-Proof / `/build`) | `feature/approach-overhaul` | pending |
-| W4 | Portfolio Index (+ Wefox-Teaser-Card, kein Detail) | `feature/portfolio-overhaul` | pending |
-| W5 | Case: Cara Care | `feature/cs-caracare-overhaul` | pending |
-| W6 | Case: SUMO Family | `feature/cs-sumo-overhaul` | pending |
-| W7 | Case: Zack.ai | `feature/cs-zack-overhaul` | pending |
-| W8 | Contact | `feature/contact-overhaul` | pending |
-| W9 | Legal (Imprint / Privacy / ToS) | `feature/legal-overhaul` | pending |
+| W1 | Index / Landing (**+ folded career strip, on-page audience switch**) | `feature/index-overhaul` | **active — section by section** |
+| W2 | **Approach / Behind the Build** (Philosophy + Workflow + Services-Essenz + AI-Proof / `/build`) | `feature/approach-overhaul` | pending (needs own scoping: naming, target-group, insights-report intake) |
+| W3 | Portfolio Index (+ Wefox-Teaser-Card, kein Detail) | `feature/portfolio-overhaul` | pending |
+| W4 | Case: Cara Care | `feature/cs-caracare-overhaul` | pending |
+| W5 | Case: SUMO Family | `feature/cs-sumo-overhaul` | pending |
+| W6 | Case: Zack.ai | `feature/cs-zack-overhaul` | pending |
+| W7 | Contact | `feature/contact-overhaul` | pending |
+| W8 | Legal (Imprint / Privacy / ToS) | `feature/legal-overhaul` | pending |
+| ~~About~~ | **CUT** — career-timeline + clients → Landing Credibility; backstory cut or → Approach; service-copy → Approach; `/about` 301 → Landing anchor | — | n/a |
+
+### W1 section loop (replaces M6-T)
+
+Per section, in order: **copy locked → Figma visual (Beni) → code (Claude) → CF preview → merge.** Hero runs end to end first as the pattern-setter. Sections: Hero · Trust-Strip · Credibility · Selected Work · Social Proof · CTA-Close (**stays at 6 — the career strip must not add a seventh**).
+
+AI design tools may run as **parallel, optional challengers** on a section that already has a Figma result. They are never the blocking path and never justify throwaway prep work. Every round is logged as a learning, win or lose — that material feeds the Approach page.
 
 **Dropped als Cases:** SafetyWing (Trust-Risiko: Live-Design ersetzt + Prozess-Albtraum) · Wefox als Detail-Case (→ Teaser-Card für Founder/Interim-Schiene). BA-Thesis raus.
 
@@ -81,6 +90,8 @@ After W9: cleanup pass — delete any `_assets/`, `_modules/`, `safari-fixes.css
 ### Inspiration-Sites — Next Iteration (PARKED)
 
 > ⏸ **Framing (2026-06-22):** Diese Sites bleiben bewusst **unangefasst bis die erste neue Iteration der wichtigsten Pages (Landing + ggf. AI-Page) released ist.** Sie sind Material für die **zweite Iterationsstufe** (Verfeinern, nicht Erst-Bau) — nicht in M4-HL/W1 reinmischen, sonst Scope-Creep. Erst nach Baseline-Release wieder rausholen.
+>
+> ⚑ **Amendment (2026-08-01):** Die Parking-Regel gilt weiter für die vier Sites unten (Verfeinerungs-Material). Sie gilt **nicht** für `hinthome.com` und `julius.fm`, die Beni aktiv als Mood-Input für die laufende Figma-Hero-Iteration nutzt. Grund für die Ausnahme: die Regel sollte Scope-Creep in einer *Research*-Phase verhindern; wir sind jetzt in konkreter visueller Iteration, wo reale visuelle Referenz nachweislich der fehlende Input war (s. `decisions.md`, 2026-07-07). Zwei Sites als scharfe Mood-Anker sind kein Scope-Creep, eine offene Sammel-Runde wäre es.
 
 | Site | Beni's Note | Was könnte nützlich sein |
 |---|---|---|
@@ -88,6 +99,14 @@ After W9: cleanup pass — delete any `_assets/`, `_modules/`, `safari-fixes.css
 | [carmen-elena.space](https://www.carmen-elena.space/) | UI-heavy/too much, aber interessante Details | Process-Visualisierung, animated signature on About, Experience-Dropdowns, Case-Detail-Struktur |
 | [trevornielsen.com](https://www.trevornielsen.com/) | Freelance, minimalistic "ways I can help" intro | Actionable Intro-Format, minimale Work-Samples-Präsentation |
 | [agentur-consulting.de](https://agentur-consulting.de/) | Design-Inspiration (2026-06-22) | Layout-/Visual-Ansatz — bei Next-Iteration analysieren |
+
+### Aktive Mood-Anker (2026-08-01, NICHT geparkt)
+
+| Site | Beni's Note | Rolle jetzt |
+|---|---|---|
+| [hinthome.com](https://hinthome.com/) | Produkt-Site; klarer Header mit "wow effect", full-width Corner-Radius-Overlay, viel White Space, minimal Content, round boxed Layout mit subtilen Gradients | Stärkste visuelle Referenz für **Hero + Section-Shell-Komposition**; deckt sich fast 1:1 mit `landing-iteration-brief.md` §2 |
+| [julius.fm](https://julius.fm/) | Gleicher Skill-Level, smarte Umsetzung, pleasing Animationen, kurz und knapp, ähnlicher minimalistischer Stil | **Volumen-Benchmark**: wie wenig Copy eine Senior-Landing braucht. Input für Content-Density-down |
+| [ldanteguarin.com](https://www.ldanteguarin.com/) | Design bewusst abgelehnt (textlastig, dunkel, weirder Farbmix); **Positioning** nah an Benis ursprünglicher Ausrichtung vor dem Corporate-Shift | **Positioning-Benchmark**, kein Visual. Pressure-Test-Artefakt für die Breite-vs-Niche-Frage |
 
 > LinkedIn-Präsenz aller Kandidaten → später Comparison-Point für Marketing-Phase (post-launch).
 

@@ -3,15 +3,23 @@
 import { useEffect, useState } from "react";
 import { DotGrid, DotGridTuner, DOT_GRID_DEFAULTS, type DotGridConfig } from "@/components/dot-grid";
 
+/* Values below are read off the Figma artboard "Landing / Home" (117:82) via figma-cli.
+   Design width is 1200 with a 1136 content column (32px gutters). */
+
 const NAV = [
   { label: "Home", href: "#" },
-  { label: "Work", href: "#work" },
+  { label: "Portfolio", href: "#work" },
   { label: "AI", href: "#ai" },
 ];
 
-/* Drop real SVGs into /public/logos/<file>.svg and add `src` — the wordmark
-   fallback keeps the composition readable until then. */
-const CLIENTS: { name: string; src?: string }[] = [
+const STATS = [
+  { value: "20", sup: "yrs", label: "Design Experience" },
+  { value: "2", sup: "", label: "Design Degrees" },
+  { value: "20", sup: "+", label: "Happy Clients" },
+  { value: "60", sup: "+", label: "successful Projects" },
+];
+
+const CLIENTS = [
   { name: "Sparkasse", src: "/logos/Sparkasse.svg" },
   { name: "Teufel", src: "/logos/Teufel.svg" },
   { name: "AOK", src: "/logos/AOK.svg" },
@@ -22,8 +30,6 @@ const CLIENTS: { name: string; src?: string }[] = [
 ];
 
 type Audience = "recruiters" | "businesses";
-
-const PORTRAIT_SRC: string | null = "/portrait.png";
 
 export function HeroV2() {
   const [config, setConfig] = useState<DotGridConfig>(DOT_GRID_DEFAULTS);
@@ -36,102 +42,143 @@ export function HeroV2() {
 
   return (
     <>
-      <section className="relative isolate flex min-h-[100svh] flex-col overflow-hidden text-white">
-        {/* gradient ground + dot layer */}
-        <div className="absolute inset-0 -z-10" style={{ background: "var(--grad-hero)" }} />
+      {/* Hero is pinned; the content panel below scrolls up over it. */}
+      <section className="sticky top-0 h-svh overflow-hidden text-white">
+        <div className="absolute inset-0" style={{ background: "var(--grad-hero)" }} />
         <DotGrid config={config} />
 
-        <div className="relative mx-auto flex w-full max-w-[88rem] flex-1 flex-col px-5 pb-0 pt-5 sm:px-8">
-          {/* glass nav */}
-          <header className="flex items-center justify-between gap-6 rounded-pill border border-white/25 bg-white/10 px-5 py-3 backdrop-blur-md sm:px-7">
-            <a href="#" className="flex items-center gap-3 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white">
+        <div className="relative mx-auto flex h-full max-w-[1200px] flex-col px-8 pt-8">
+          {/* Top nav — Figma: 1136x66, r16, #130738 @10%, 1px stroke, glass blur, soft shadow */}
+          <header
+            className="flex h-[66px] shrink-0 items-center justify-between gap-6 rounded-[16px] border border-white/20 px-[17px] backdrop-blur-[50px]"
+            style={{
+              background: "rgba(19, 7, 56, 0.10)",
+              boxShadow: "0 0 24px rgba(19, 7, 56, 0.20)",
+            }}
+          >
+            <a
+              href="#"
+              className="flex items-center gap-[18px] pl-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+            >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/logo.svg"
-                alt=""
-                className="h-8 w-auto brightness-0 invert"
-                aria-hidden
-              />
+              <img src="/logo.svg" alt="" aria-hidden className="h-8 w-[46px] brightness-0 invert" />
               <span className="hidden leading-tight sm:block">
                 <span className="block text-[15px] font-semibold">Benjamin Erxleben</span>
-                <span className="block text-[13px] text-white/70">Senior Product Designer</span>
+                <span className="block pt-1.5 text-[13px] text-white/70">Senior Product Designer</span>
               </span>
             </a>
 
-            <div className="flex items-center gap-5 sm:gap-8">
-              <nav className="flex items-center gap-5 sm:gap-8">
-                {NAV.map((item, i) => (
-                  <a
-                    key={item.label}
-                    href={item.href}
-                    className={`text-[13px] uppercase tracking-[0.16em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white ${
-                      i === 0 ? "font-semibold underline underline-offset-8" : "text-white/75 hover:text-white"
-                    }`}
-                  >
-                    {item.label}
-                  </a>
-                ))}
-              </nav>
+            <nav className="hidden items-center gap-8 md:flex">
+              {NAV.map((item, i) => (
+                <a
+                  key={item.label}
+                  href={item.href}
+                  className={`text-[18px] uppercase leading-none tracking-[0.16em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white ${
+                    i === 0
+                      ? "font-medium underline underline-offset-[10px]"
+                      : "text-white/75 hover:text-white"
+                  }`}
+                >
+                  {item.label}
+                </a>
+              ))}
+            </nav>
 
-              <a
-                href="https://www.linkedin.com/in/benjaminerxleben/"
-                target="_blank"
-                rel="noreferrer"
-                aria-label="LinkedIn"
-                className="grid h-9 w-9 place-items-center rounded-lg bg-white text-ink transition-transform hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
-              >
-                <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4" aria-hidden>
-                  <path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5ZM3 9h4v12H3V9Zm7 0h3.8v1.7h.05a4.2 4.2 0 0 1 3.75-2c4 0 4.75 2.5 4.75 5.8V21h-4v-5.6c0-1.35-.03-3.1-1.9-3.1-1.9 0-2.2 1.48-2.2 3v5.7h-4V9Z" />
-                </svg>
-              </a>
-            </div>
+            <a
+              href="https://www.linkedin.com/in/benjaminerxleben/"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="LinkedIn"
+              className="grid h-8 w-8 shrink-0 place-items-center rounded-[8px] bg-white text-ink transition-transform hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4" aria-hidden>
+                <path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5ZM3 9h4v12H3V9Zm7 0h3.8v1.7h.05a4.2 4.2 0 0 1 3.75-2c4 0 4.75 2.5 4.75 5.8V21h-4v-5.6c0-1.35-.03-3.1-1.9-3.1-1.9 0-2.2 1.48-2.2 3v5.7h-4V9Z" />
+              </svg>
+            </a>
           </header>
 
-          {/* content + portrait */}
-          <div className="grid flex-1 items-end gap-8 pt-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] lg:items-center lg:gap-4 lg:pt-0">
-            <div className="flex flex-col gap-7 pb-16 lg:pb-24">
-              {/* audience switch */}
-              <div className="flex items-center gap-3 text-[15px]">
-                {(["recruiters", "businesses"] as const).map((key, i) => (
-                  <span key={key} className="flex items-center gap-3">
-                    {i > 0 && <span aria-hidden className="text-white/40">·</span>}
-                    <button
-                      type="button"
-                      onClick={() => setAudience(key)}
-                      aria-pressed={audience === key}
-                      className={`rounded-sm transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white ${
-                        audience === key
-                          ? "font-semibold text-white underline underline-offset-8"
-                          : "text-white/60 hover:text-white/90"
-                      }`}
-                    >
-                      {key === "recruiters" ? "For Recruiters" : "For Businesses"}
-                    </button>
+          {/* Hero body */}
+          {/* Figma indents the hero body 80px inside the 1136 column */}
+          <div className="grid min-h-0 flex-1 grid-cols-1 items-center gap-8 lg:grid-cols-[minmax(0,637px)_minmax(0,1fr)] lg:pl-20">
+            <div className="flex flex-col gap-10 pb-8">
+              {/* Audience selector — Figma: 20px, active SemiBold + 2px rule, 4px dot divider */}
+              <div className="flex items-center gap-3 text-[20px] leading-[1.4]">
+                <button
+                  type="button"
+                  onClick={() => setAudience("recruiters")}
+                  aria-pressed={audience === "recruiters"}
+                  className="focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+                >
+                  <span className={audience === "recruiters" ? "font-semibold" : "text-white/70"}>
+                    For Recruiters
                   </span>
-                ))}
+                  <span
+                    className={`mt-1 block h-0.5 rounded-full bg-white transition-opacity ${
+                      audience === "recruiters" ? "opacity-100" : "opacity-0"
+                    }`}
+                  />
+                </button>
+
+                <span aria-hidden className="h-1 w-1 shrink-0 rounded-full bg-white" />
+
+                <button
+                  type="button"
+                  onClick={() => setAudience("businesses")}
+                  aria-pressed={audience === "businesses"}
+                  className="focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+                >
+                  <span className={audience === "businesses" ? "font-semibold" : "text-white/70"}>
+                    For Businesses
+                  </span>
+                  <span
+                    className={`mt-1 block h-0.5 rounded-full bg-white transition-opacity ${
+                      audience === "businesses" ? "opacity-100" : "opacity-0"
+                    }`}
+                  />
+                </button>
               </div>
 
-              <div className="flex flex-col gap-5">
-                <h1 className="max-w-[16ch] font-heading text-[clamp(2.75rem,7vw,5rem)] font-medium leading-[1.02] tracking-[-0.02em] text-white/55 text-balance">
-                  0<span aria-hidden>→</span>
+              <div className="flex flex-col gap-8">
+                {/* H1 — Figma: 56px Medium, white at 45% opacity, arrow is a 5.5px stroked vector */}
+                <h1 className="flex items-center gap-1.5 text-[clamp(2.25rem,4.6vw,3.5rem)] font-medium leading-none tracking-[-0.01em] text-white/[0.45]">
+                  0
+                  <svg
+                    viewBox="0 0 23 22"
+                    fill="none"
+                    className="h-[0.4em] w-auto shrink-0"
+                    aria-hidden
+                  >
+                    <path
+                      d="M1 11h20M13 3l8 8-8 8"
+                      stroke="currentColor"
+                      strokeWidth="2.6"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
                   <span className="sr-only">to</span>1 Product Design
                 </h1>
 
-                {/* Proposal: "20 years" folded into the sentence (julius.fm pattern) so the
-                    hero carries one strong number without a competing stats row. */}
-                <p className="max-w-[46ch] text-[clamp(1.0625rem,1.9vw,1.375rem)] leading-[1.45] text-white/90">
-                  I&apos;m <strong className="font-semibold text-white">Benjamin</strong>. End-to-end
-                  hands-on IC with <strong className="font-semibold text-white">20 years</strong> in
-                  design, AI-native, at home in B2C SaaS and regulated, high-complexity markets.
+                {/* Subline — Figma: 24px / 140%, dark glow behind for legibility */}
+                <p
+                  className="max-w-[626px] text-[clamp(1.0625rem,1.7vw,1.5rem)] leading-[1.4]"
+                  style={{ textShadow: "0 0 120px rgba(19, 7, 56, 1)" }}
+                >
+                  I&rsquo;m <strong className="font-semibold">Benjamin</strong>. End-to-end hands-on
+                  IC, <strong className="font-semibold">AI-native</strong>, at home in{" "}
+                  <strong className="font-semibold">B2C SaaS</strong> and regulated,{" "}
+                  <strong className="font-semibold">high-complexity markets</strong>
                 </p>
               </div>
 
-              <div className="flex flex-wrap items-center gap-3">
+              {/* Buttons — Figma: h46, r8, pad 9/20, 20px Medium */}
+              <div className="flex flex-wrap items-center gap-4">
                 <a
                   href="#cv"
-                  className="group inline-flex items-center gap-2.5 rounded-pill bg-bene-purple py-4 pl-5 pr-6 text-[15px] font-semibold text-white shadow-lift transition-all hover:bg-[#5a2fe8] hover:shadow-hero focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+                  className="inline-flex h-[46px] items-center gap-2 rounded-[8px] bg-bene-purple px-5 text-[20px] font-medium text-white transition-colors hover:bg-[#5a2fe8] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+                  style={{ boxShadow: "0 0 50px rgba(19, 7, 56, 0.45)" }}
                 >
-                  <svg viewBox="0 0 24 24" fill="none" className="h-[18px] w-[18px]" aria-hidden>
+                  <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5 shrink-0" aria-hidden>
                     <path
                       d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z"
                       fill="currentColor"
@@ -150,10 +197,10 @@ export function HeroV2() {
 
                 <a
                   href="#contact"
-                  className="inline-flex items-center gap-2.5 rounded-pill border border-white/45 py-4 pl-6 pr-5 text-[15px] font-semibold text-white transition-colors hover:border-white/70 hover:bg-white/12 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+                  className="inline-flex h-[46px] items-center gap-2.5 rounded-[8px] border-[1.5px] border-white bg-white/[0.01] px-5 text-[20px] font-medium text-white transition-colors hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
                 >
                   Book a Call
-                  <svg viewBox="0 0 24 24" fill="none" className="h-[18px] w-[18px]" aria-hidden>
+                  <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5 shrink-0" aria-hidden>
                     <path
                       d="M21 11.5a8.38 8.38 0 0 1-9 8.4 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.1A8.38 8.38 0 0 1 4 12a8.5 8.5 0 0 1 8.5-8.5 8.38 8.38 0 0 1 8.5 8Z"
                       stroke="currentColor"
@@ -167,48 +214,64 @@ export function HeroV2() {
                   </svg>
                 </a>
               </div>
-            </div>
 
-            <div className="relative hidden self-end lg:block">
-              {PORTRAIT_SRC ? (
-                /* Sized to run past the section edge so the trust panel crops it,
-                   the way the Figma header does. */
-                /* eslint-disable-next-line @next/next/no-img-element */
-                <img
-                  src={PORTRAIT_SRC}
-                  alt="Benjamin Erxleben"
-                  className="pointer-events-none ml-auto -mb-6 block h-auto w-full max-w-[34rem] select-none object-contain"
-                />
-              ) : (
-                <div className="ml-auto flex h-[26rem] w-full max-w-[30rem] items-end justify-center rounded-t-shell border border-dashed border-white/30 bg-white/5 pb-6 text-small text-white/50">
-                  portrait cutout → /public/portrait.png
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* trust panel peeking in from the bottom of the first viewport */}
-        <div className="relative mx-auto w-full max-w-[88rem] px-5 sm:px-8">
-          <div className="rounded-t-section bg-background px-6 pb-10 pt-8 text-ink sm:px-12">
-            <p className="text-center text-small text-ink-subtle">Trusted by</p>
-            <ul className="mt-6 flex flex-wrap items-center justify-center gap-x-10 gap-y-6 opacity-70 grayscale sm:gap-x-14">
-              {CLIENTS.map((c) => (
-                <li key={c.name}>
-                  {c.src ? (
-                    /* eslint-disable-next-line @next/next/no-img-element */
-                    <img src={c.src} alt={c.name} className="h-7 w-auto object-contain" />
-                  ) : (
-                    <span className="font-heading text-[1.05rem] font-semibold tracking-tight text-ink">
-                      {c.name}
+              {/* Competence cards — Figma: 144x82, r11, white @10%, label 10px @40% */}
+              <ul className="flex gap-5">
+                {STATS.map((s) => (
+                  <li
+                    key={s.label}
+                    className="flex h-[82px] w-[144px] flex-col justify-between rounded-[11px] bg-white/10 p-[13px]"
+                  >
+                    <span className="text-[28px] font-semibold leading-none">
+                      {s.value}
+                      {s.sup && <sup className="ml-0.5 text-[14px] font-medium">{s.sup}</sup>}
                     </span>
-                  )}
-                </li>
-              ))}
-            </ul>
+                    <span className="text-[10px] leading-none text-white/40">{s.label}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Portrait — Figma: 407x483, bottom-anchored right */}
+            <div className="relative hidden h-full items-end justify-end lg:flex">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/portrait.png"
+                alt="Benjamin Erxleben"
+                className="pointer-events-none block h-auto w-full max-w-[30rem] translate-x-8 select-none object-contain"
+              />
+            </div>
           </div>
         </div>
       </section>
+
+      {/* Content panel — full-bleed, rides up over the pinned hero on scroll */}
+      <div className="relative z-10 rounded-t-section bg-background text-ink shadow-[0_-24px_60px_-24px_rgba(19,7,56,0.35)]">
+        <div className="mx-auto max-w-[1200px] px-8 py-14">
+          <p className="text-center text-small text-ink-subtle">Trusted by</p>
+          <ul className="mt-8 flex flex-wrap items-center justify-center gap-x-12 gap-y-7 opacity-70 grayscale">
+            {CLIENTS.map((c) => (
+              <li key={c.name}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={c.src} alt={c.name} className="h-7 w-auto object-contain" />
+              </li>
+            ))}
+          </ul>
+
+          {/* Placeholder length so the scroll-over behaviour is testable. */}
+          <div className="mt-20 grid gap-6 pb-40 md:grid-cols-3">
+            {["Selected Work", "Approach", "Get in touch"].map((t) => (
+              <div key={t} className="rounded-card bg-card p-8 shadow-card">
+                <h2 className="text-h4 font-semibold">{t}</h2>
+                <p className="mt-3 text-body text-ink-muted">
+                  Section placeholder — here so the panel has enough length to scroll over the
+                  pinned hero.
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
 
       {tuning && <DotGridTuner config={config} onChange={setConfig} />}
     </>

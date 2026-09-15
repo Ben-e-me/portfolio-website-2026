@@ -99,6 +99,8 @@ const page = `<!doctype html>
   });
 })();
 </script>
+<!-- Cloudflare Web Analytics (cookieless), same site token as app/layout.tsx -->
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "ec3112e86b694a0caad3132122a0514"}'></script>
 </body>
 </html>
 `;
